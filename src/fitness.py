@@ -1,6 +1,2 @@
-#!/usr/bin/python
+#!/usr/bin/python	
 
-# Testing for a commit.
-	
-	
-             
