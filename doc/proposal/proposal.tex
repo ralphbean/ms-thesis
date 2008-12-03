@@ -1,0 +1,626 @@
+\documentclass[12pt]{article}
+\usepackage{amsfonts}
+\title{Thesis Proposal:  Chaos in Classes of Artificial Neural Networks}
+\author{Ralph Bean\\
+Department of Computer Science\\
+Rochester Institute of Technology\\
+\texttt{ralph.bean@gmail.com}}
+\pagestyle{headings}
+\begin{document}
+\maketitle
+\vfill
+\textbf{Thesis Committe.}
+
+\textbf{Advisor:}\hspace{14pt}Dr. Roger Gaborski
+
+\textbf{Observer:}\hspace{7pt}Dr. Peter Anderson \textit{(Unconfirmed)}
+
+\textbf{Reader:}\hspace{18pt}Thomas Borelli
+
+
+\newpage
+\setcounter{secnumdepth}{3}
+
+\tableofcontents
+\newpage
+
+\section{Introduction}
+The computational tasks of nonlinear classification and control are of high
+importance to those interested in vision and acoustics.  The information
+of interest in real world signals is most often embedded intrinsically in
+their temporal structure.  Examples include distinguishing between and
+producing the subtleties of human speech and predicting natural time series 
+such as weather patterns and radioactive decay \cite{verstraeten, weigend} 
+
+For many tasks, humans outcompete state-of-the-art computational techniques
+hands-down in both accuracy and flexibility.
+
+Consequently, techniques regarding recurrent neural networks 
+are of interest to computing research as a potential solution which could
+harness the hard work already done for us computer scientists by the process
+of biological evolution itself. 
+
+A large amount of theory has been developed with regard to feed-forward
+neural networks from how to train them in both supervised and unsupervised
+paradigms as well as why and how they work.  Things are not as nice when
+we consider networks that have recurrent connections or feed-back connections.
+Doya \cite{doya} 
+provides an excellent description of the problems confronting gradient
+descent for training recurrent networks.
+
+The primary inspiration for this proposal came in 2001 from the work of 
+Jaeger \cite{jaeger_original}.  
+The Echo State Network (ESN) described there combined
+a randomly generated recurrent network with a linear readout mechanism trained
+to classify the state of the recurrent network.  This proposed thesis treats
+itself as a part of a process attempting to theoretically explain the
+experimental success of Jaeger and others work \cite{maass_original}.
+
+One attempt to do so was authored by Verstraten \cite{verstraeten}
+who was the first
+to use Lyapunov exponents as a measurement of chaos in the context of Jaeger's
+work.  It must be stated though that Verstraeten's application was built on a
+misunderstanding of Lyapunov exponents.  In \cite{verstraeten}, 
+only the first iteration
+of the map defined by the network was considered in calculating Lyapunov 
+exponents.  Lyapunov exponents involve taking the limit of infinite 
+compositions of the map with itself which, for transcendental activation 
+functions like the hyperbolic tangent function most often considered for 
+artificial neural networks, is incalculable.
+
+The point of this proposed thesis is to clarify notions of the edge of chaos
+as they apply to artifical neural networks.  Sections 2 and 3 briefly describe
+some background in artificial neural networks and dynamical systems theory.  
+The thrust of the thesis is a proof of the absence
+of chaotic motion in all autonomous artificial neural networks in section 4
+and a proposal for a genetic algorithm to shed light on the common 
+characteristics of nonautonomous artificial neural networks which do exhibit
+the chaotic motion in section 5.  Section 6 is a timeline for completing the
+proposed work.
+
+\section{Artificial Neural Networks (ANNs)}
+Artificial Neural Networks are a computational model of natural brains that
+consist of a network of "neurons".  These artificial neuron models activate 
+more or less in response to
+each other and a series of inputs as governed by a system of equations \cite{jaeger_original, doya, dayan}.
+They are perhaps best contrasted with
+the Biological Neural Network or Spike/Pulsed Neural Network computing models
+which are more biologically realistic but more computationally expensive and
+more theoretically unwieldy \cite{maass_book, fitzhugh, izhikevich_book}.
+
+%In the final document of the proposed thesis, a much expanded version of 
+%this section
+%will be included detailing the differences in different training methods
+%for feed-forward networks and a description of the difficulties training
+%recurrent networks complimenting a section on Jaeger's work.
+
+\section{Chaos}
+
+Dynamical systems theory is a branch of mathematics that deals with systems 
+of change rules and the ultimate fate of solutions to those systems.  A system
+which has orbits which do not leave a particular interval and are not periodic
+are called chaotic -- and chaotic systems have many interesting properties 
+\cite{alligood, arrowsmith, devaney, hirsch}.
+
+%In the final document of the proposed thesis, a short discussion on
+%chaos in general will be present documenting bifurcations and the 
+%period doubling route to chaos.
+
+\section{Chaos in ANNs}
+\subsection{Autonomous ANNs}
+The author's stated purpose at the beginning of the summer was to "derive 
+constraints on the
+parameters of a neural network such that the dynamics of the network under
+no input (i.e. the baseline behavior) are chaotic."  In July,
+a proof was developed showing that there are no such
+solutions in the parameter space of an artificial (discrete-time) neural
+network which makes use of the sigmoid (hyperbolic tangent) activation function
+alone.
+
+\subsubsection{Single-neuron Networks}
+
+Chaos in one-dimensional discrete-time dynamical systems is much more well
+understood than in any other non-trivial class of systems.  Proof that
+a new one-dimensional system is chaotic may be done by application of
+Sarkovskii's Theorem
+which, in its condensed form, states that any one-dimensional discrete-time 
+dynamical system which has a periodic orbit of prime period $3$, has 
+periodic orbits of every other prime period \cite{devaney}.  The natural numbers are 
+countably infinite.  An infinite number of distinct periodic orbits on an 
+open interval implies density (much like the argument for density of the 
+rationals) and density of periodic orbits is the very topological definition 
+of chaos.
+
+Our one-neuron recurrent network can be expressed as a dynamical system:
+$$x_{t+1} = f(x_{t}) = tanh(w*x_{t} + b)$$
+where $x_{t}$ is the state of the neuron at time $t$, $w$ is the weight of the 
+connection from this neuron to itself, and $b$ is the bias of the neuron 
+towards activation.  We have a one-dimensional phase space and a 
+two-dimensional parameter space.
+
+One method is to use 
+Sarkovskii's Thereom on the above equation and solve for $x = f(f(f(x)))$ and 
+say "See, the equality only holds if $w$ and $b$ take on 'this' relationship."
+However, due to our neuron's activation function being transcendental and
+consequently, non-algebraic, $x = f(f(f(x)))$ eluded manipulation.
+(even intractable for Mathematica).
+
+An entirely different (and more often used) method of proving the existence
+of chaos in a dynamical system is to show that it is topologically conjugate
+to another known chaotic dynamical system such as the shift map, the smale 
+horsehoe map, or the logistic map \cite{devaney, hirsch}.
+These three are all defined quite differently but have nonetheless been.
+shown to be conjugate to one another.  To show topological conjugacy.
+between two dynamical systems $f(x)$ and $g(x)$, one must provide a.
+function, a homeomorphism, $h(x)$ such that $h^{-1} \circ f = g \circ h$.
+One might hope to provide such a homeomorphism between our 
+single-neuron artificial.
+neural network and the logistic map, $x_{t+1} = \mu x (1-x)$.  
+Many attempts at this failed.  Is there such an $h(x)$?
+
+\textit{Claim:}  A network of one recurrently connected neuron in the
+absence on online input does not have a chaotic baseline for any
+combination of parameters.
+
+\textit{Proof:}
+Let our neural network's change function be denoted by $g(x)$ and the logistic map be denoted by $f(x)$
+Suppose there exists an $h$ such that $h$ is a homeomorphism
+between $f$ and $g$.  Then $h$ must map every dynamicaly unique
+orbit of $f$ onto the orbits of $g$.  Observe that the logistic map has a
+critical point ($f^{\prime} = 0$) at $x=\frac{1}{2}$ for all $\mu$.  This.
+critical point divides the domain of $f$ into two distinct subintervals.
+which map to a common range.  More.
+specifically, $f(\frac{1}{2} + \delta_{1}) = f(\frac{1}{2} - \delta_{2})$.
+where $\delta_{1} \neq \delta_{2}$ and $\delta_{1} \le \delta_{2}$ without loss of generality for infinitely many (although distinct).
+pairs of $\delta_{1}$ and $\delta_{2}$.
+
+Now note that $g^{\prime}(x) = (1 - tanh^{2}(wx+b))w \neq 0$ for all $x$ except the trivial case where $w=0$...
+Consequently, for every $x \neq -\frac{b}{w}$, there can be no $y$.
+such that $g(x) = g(y)$.
+
+$$f(\frac{1}{2} + \delta_{1}) = f(\frac{1}{2} - \delta_{2})$$
+$$h(f(\frac{1}{2} + \delta_{1})) = h(f(\frac{1}{2} - \delta_{2}))$$
+$$h(f(\frac{1}{2} + \delta_{1})) = g(h^{-1}(\frac{1}{2} + \delta_{1})$$
+$$g(h^{-1}(\frac{1}{2} + \delta_{1})) = g(h^{-1}(\frac{1}{2} + \delta_{2})$$
+$$\delta_{1} = \delta_{2}$$
+   Contradiction.  The only assumption was existence of $h$ therefore there 
+   is no such $h$. So, $f$ and $g$ are not homeomorphic and therefore $g$ 
+   is not chaotic, regardless of parameter choice.
+
+\subsubsection{Multi-neuron Networks}
+
+We are left crestfallen!  Can the same be the case for networks of multiple
+neurons?  Initially we might guess not.  Henri Poincar\'e proved continuous
+(not our discrete) dynamical systems may not be chaotic in either one or two
+dimensions but may be in three or above.  We will proceed with proof by 
+contradiction assuming the $h$ as above but we need first to consider the
+topological possibilities of this more general case.
+
+First of all, forgetting topology, is a homeomorphism $h$ between $f$ the one 
+dimensional logistic map, and our multi-neuron network $g$ 
+\textit{algebraically} possible?  Well, 
+$f : \mathbb{R}^{1} \rightarrow \mathbb{R}^{1}$, 
+$g : \mathbb{R}^{n} \rightarrow \mathbb{R}^{n}$, where $n$ is the number of
+neurons in our network and $n \neq 1$.  There is no pair $<l, m>$ such 
+that $h : \mathbb{R}^{l} \rightarrow \mathbb{R}^{m}$ is valid to 
+consider in $h^{-1} \circ f = g \circ h$.
+
+Instead, let's reconsider our choice of $f$.  Other multi-dimensional discrete
+systems are known to be chaotic, but the logistic map is most friendly so we
+will stay close to home.  Let $f$ now denote an $n$ dimensional trivial
+coupling of logistic maps where a separate, independent map controls the
+dynamics of each of the $n$ components.
+
+\textit{Claim:}  A recurrently connected network of $n$ neurons in the absence
+of online input does not have a chaotic baseline for any combination of
+parameters.
+
+\textit{Proof:}
+Let our $n$-neuron neural network's change function be denoted by $g(x)$ 
+and the trivial coupling of logistic maps be denoted by $f(x)$ where $f(x) =$
+\[ \left( \begin{array}{c}
+\mu_{1}*x_{1}*(1-x_{1}) \\
+\mu_{2}*x_{2}*(1-x_{2}) \\
+\vdots \\
+\mu_{n}*x_{n}*(1-x_{n}) \end{array} \right)\]
+and where $g(x) =$
+\[ \left( \begin{array}{c}
+tanh(a_{11}x_{1} + a_{12}x_{2} + \cdots + a_{1n}x_{n}) \\
+tanh(a_{21}x_{1} + a_{22}x_{2} + \cdots + a_{2n}x_{n}) \\
+\vdots \\
+tanh(a_{n1}x_{1} + a_{n2}x_{2} + \cdots + a_{nn}x_{n}) \end{array} \right)\]
+
+Does there exist a homeomorphism $h$?  As before, such an $h$ will have to 
+map every dynamically unique orbit of $f$ onto $g$ and $g$ onto $f$.  As 
+before, $f$ has at least one critical point where $f^{\prime}$ equals zero and
+orbits on either side map to dynamically unique regions of the phase space which
+contributes to the 'mixing' quality of chaotic motion.
+
+Is any component of $g^{\prime}(x)$ possibly zero at some $x$?  We can no
+longer deal with one-dimensional derivatives and will instead now employ the 
+Jacobian of
+$g(x)$, $J(g(x))$ which gives a matrix, the entries of which constitute the 
+derivative
+of every equation of the system with respect to every system 
+variable.  $J(g(x)) =$
+\[ \left( \begin{array}{ccc}
+a_{11}tanh^{\prime}(a_{11}x_{1} + a_{12}x_{2} + \cdots + a_{1n}x_{n}) &
+\cdots &
+a_{1n}tanh^{\prime}(a_{11}x_{1} + a_{12}x_{2} + \cdots + a_{1n}x_{n}) \\ 
+
+\vdots & \ddots & \vdots \\
+
+a_{n1}tanh^{\prime}(a_{n1}x_{1} + a_{n2}x_{2} + \cdots + a_{nn}x_{n}) &
+\cdots &
+a_{nn}tanh^{\prime}(a_{n1}x_{1} + a_{n2}x_{2} + \cdots + a_{nn}x_{n}) 
+\end{array} \right)\]
+
+We can deduce some information about the critical points of $g$ by looking
+at the eigenvalues of $J(g(x))$ which characterize the tangent space of $g$.
+Since we are looking for zero-valued eigenvalues, we can simplify our approach
+and look simply at the determinant which is equal to the product of the
+eigenvalues.  We won't know which eigenvalue takes on a zero-value but we
+are only interested so far in the existence of such a value.
+
+To do this, we introduce a new theorem and its proof which gives the 
+determinant of $J(g(x))$ denoted $|J(g(x))|$.
+
+\textit{Claim:} $|J(g(x))| = |A| \Pi_{i=1}^{n}tanh^{\prime}(a_{i} \cdot x)$
+Where $|A|$ is the determinant of the weight matrix $A$ and $a_{i} \cdot x$
+is the dot-product of the $i^{th}$ row of $A$ with the state $x$.
+
+The proof will proceed by induction.  The base case is from a one-neuron
+network where the weight matrix $A = [a]$, the weight of the neuron connecting
+back to itself.  $g(x) = tanh(ax)$, $J(g(x)) = [a tanh^{\prime}(a x)]$,
+The determinant of $A$, $|A|=a$.  The determinant of 
+$|J(g(x))|=a tanh^{\prime}(a x)=|A| tanh^{\prime}( a_{1} \cdot x )$.
+
+For the inductive step, suppose the claim is true for networks of size $i$,
+we will inspect and see if it is true for networks of size $i+1$.
+
+We use the cofactor expansion method for finding the determinant of a matrix
+down the arbitrarily chosen $l^{th}$ column.
+
+$$|J(g(x))|=$$$$
+a_{1,l}tanh^{\prime}(a_{1}\cdot x)|J_{1,l}| -
+$$ $$ \cdots $$ $$
++ a_{i+1,l}tanh^{\prime}(a_{i+1}\cdot x)|J_{i+1,l}|$$
+The terms $J_{k,l}$ above are the $k-j$ minors of $J(g(x))$ and are matrices
+of size $i$.  Knowing this we can substitute in our assumption.
+$$|J(g(x))|=$$ $$
+a_{1,l}tanh^{\prime}(a_{1}\cdot x)
+(|A_{1,l}| \Pi_{j=1}^{i}tanh^{\prime}(a_{j} \cdot x)) -
+$$ $$ \cdots $$ $$
++ a_{i+1,l}tanh^{\prime}(a_{i+1}\cdot x)
+(|A_{i+1,l}| \Pi_{j=1}^{i}tanh^{\prime}(a_{j} \cdot x))$$
+In the above sum of products, each $\Pi$ term contains the $tanh^{\prime}$ of
+dot-product of $i$ of the $i+1$ rows of $A$ with $x$.  The $tanh^{\prime}$ of 
+the one extra left out row, for each product, is included in the extracted 
+cofactor.  Knowing this we can safely factor out the product of the 
+$tanh^{\prime}$ of the $i+1$ rows of $A$, giving $|J(g(x))|$
+
+$$=(a_{1,l}|A_{1,l}| - a_{2,l}|A_{2,l}| + \cdots + a_{i+1,l}|A_{i+1,l}|)
+\Pi_{j=1}^{i+1}tanh^{\prime}(a_{j} \cdot x)$$
+$$=|A| \Pi_{j=1}^{i+1}tanh^{\prime}(a_{j} \cdot x)$$
+
+The inductive step is shown.  \textit{q.e.d.}
+
+Now given this formula for the determinant of $J(g(x))$, what can we say
+about its eigenvalues, for $g(x)$, its coresponding critical points and its 
+candidacy for conjugacy with $f(x)$?
+
+None of the $tanh^{\prime}$ terms will ever be zero.
+
+Of note, $|J(g(x))|=0$ when $|A|=0$.  This is, however, not of interest.
+Neural networks represented by singular weight matrices have disconnected
+subnetworks.  No information is shared between them.  Without loss of generality
+we can say that we might as well have considered one subnetwork or the other
+\footnote{Our motivation here is to show the nonexistence of
+a homeomorphism with a system exhibiting chaotic motion.  The existence of
+a zero-valued derivative is a necessary condition for this, but not sufficient.
+The existence of a zero-valued derivative for artificial
+neural systems with singular weight matrices is a trivial byproduct of their
+networks being disconnected and will likely not meet other necessary
+conditions for a homeomorphism's existence }.
+
+The nonexistance of a homeomorphism $h$ between $f$ and $g$ follows from the
+demonstration of a lack of a critical point for $g$.  Therefore $g$ does not 
+exhibit chaotic motion under any parameterization.
+
+\subsection{Nonautonomous ANNs}
+The above demonstration of autonomous ANNs' lack of chaotic solutions leads us
+to consider the more theoretically cumbersome case of nonautonomous ANNs.
+Dynamical systems theory has been geared towards the study of autonomous
+systems \cite{hirsch}.  
+However, one can rethink simpler nonautonomous sytems in
+terms of more complex autonomous ones by considering the product space of
+the nonautomous sytem and its input signal.  This system (of necessarily higher
+dimension) is autonomous in the formal sense and is now a valid object for
+measurement under autonomous dynamical systems theoretic metrics such as 
+the Lyapunov spectrum.
+
+It is worth citing \cite{maass_what_makes} 
+who characterizes the lyapunov exponents of
+nonautonomous sytems without the above consideration.  There, in the DST 
+divergence condition of chaotic systems, the 'small differences in the 
+initial state of the system' is taken to mean 'small differences in the online
+signal'.  While this is practically relevant to building robust systems, it
+is not compatible with formal notions of chaos.  In the proposed thesis here,
+we attempt to address neural systems from a more orthodox DST ground.
+
+Previously, in the 'off-line' case for ANNs, we asked the question 'under what
+conditions or constraints is the behavior of an ANN to be considered chaotic?'
+An ANN is constituted only of its activation function and weight matrix.  We
+assumed the hyperbolic tangent (tanh) activation then as we do now and we
+take the weight matrix to be composed of real numbers.  Now, in the on-line
+and nonautonomous we must also consider
+an input signal which we will take to be continuous and sampled at some regular
+constant interval $dt$ and which can be described as a function $f(x)$ and some
+initial offset $x_{0}$.
+
+Whereas Maass measured the sensitivity of neural systems to small differences
+in the input, namely the input signal \cite{maass_what_makes}, 
+here we will take the input signal as
+a static part of the system itself and measure the sensitivity (read:
+Lyapunov exponents) of the system and take the 'small differences' to be, as
+in dynamical systems theory, small differences in the initial state of 
+the neural system.  
+
+An attempt
+at an analogy to a behaviorist study of humans:  whereas Maass' 
+approach would measure the difference of the same subjects' reaction to 
+stimuli which differ only slightly, the approach proposed here would measure
+the difference of the same subjects' reaction to the \textit{same} stimuli
+when primed by slightly different sets of stimuli preceeding the measurement.
+
+\section{Genetic Algorithm}
+A purely analytic approach was taken in the above section on autonomous 
+artificial neural networks.  The introduction of an input signal into the
+work presents challenges which make analytic results beyond the scope of a
+M.S. thesis.  Consequently, a genetic algorithm is proposed with
+the express purpose of suggesting direction for future analytic research.
+
+\subsection{Goal}
+Typically, genetic algorithms are employed to approximate solutions to problems
+which are difficult to compute but easy to verify.  A classic example is the
+travelling salesman problem:  Given a graph, what is the shortest path that
+visits every vertex and that starts and stops on the same vertex.  Computing
+this solution for arbitrarily large graphs is intractable but approximation
+with genetic algorithms is satisfactorilly fast.  This is possible by 
+virtue of the
+ease of quantifying the 'fitness' of potential solution which is, in the case 
+of the travelling salesman problem, the shortness of the path.
+
+In this proposed thesis, we are trying to find artificial neural networks
+and associated input signals that behave chaotically.  This can be quantified
+by approximating the Lyapunov spectrum of the system, a task that is more 
+computationally expensive than just measuring the shortness of a path on a
+graph, but a task we can compute nonetheless.
+
+Genetic algorithms have been often applied to neural networks with the goal
+of creating a network that solves a particular problem \cite{doya}.
+Typically, the fitness is how well the network achieves the desired behavior
+in a simulation.  In our case this is not enough and is where the proposed
+thesis takes on its novel character.
+
+In Maass' publications \cite{maass_original}, 
+networks are randomly searched for
+that meet the necessary criteria.  Jaeger provides a stochastic method for
+constructing networks \cite{jaeger_original}.  
+The goal of this genetic algorithm will
+be to evolve, not a neural network, but a system of equations that define
+constraints on a neural network and its input, that define a 
+\textit{family} of neural networks and inputs.  The hope is that the product
+of simulated evolution will provide clues as to just what it is about 
+certain neural networks and their associated inputs that produces
+chaotic behavior
+and what role chaos can play in computing theory.  This thesis began
+analytically and here moves towards experiment, but experiment directed
+expressly at future analytic attempts. 
+
+\subsection{Representation}
+Organisms in the proposed genetic algorithm consist of a description of the
+size of the network, $n$, a variable-length conjunction of variable-length constraints on the weights of the network, and a variable-length expression of
+the input signal, a function $f(x)$ and an intial offset $x_{0}$.
+
+The most managable genetic representation of variable length individuals is
+a binary tree.  Elements of the tree are either binary operators, variable
+symbolic operands, or constants.  Two trees will be needed to describe 
+individuals:  one for the system of contraints on the weight matrix, and 
+another for the expression of the input signal.  
+
+Operators include all the arithmetic operators:  addition, subtraction, multiplication, division, and exponentiation as well as trigonometric functions for the
+input signal only.
+
+Symbolic operands apply to constraints on the network only (not the input
+signal) and refer to indices in the networks' weight matrices.
+
+\subsection{Crossover}
+Crossover is more complicated for variable-length-individual genetic algorithms,
+the above tree representation was chosen to facilitate a more simple crossover
+implementation.
+
+Crossover can be achieved by randomly picking a branch in both parent trees
+and splicing together the respective roots and branches to make children.
+Additionally, \cite{clegg} describes a new technique for crossover as applied to
+genetic programming (another variable-length-individual GA technique) which
+will be applied here as well and compared to the simpler first proposed method.
+
+\subsection{Mutation}
+Mutation on individuals represented as trees will amount to a random choice of 
+a few operations:  Random pruning of subtrees, random generation of an 
+addition of new subtrees, and random flipping of bits in symbolic variables 
+and constants.
+
+\subsection{Fitness Metric}
+The fitness metric is the most complex aspect of this approach and encapsulates
+the majority of both the work and theory.
+
+\subsubsection{Lyapunov Spectrum}
+Given a neural network and an associated input signal, a good metric for
+experimentally determining how chaotic the system is is to measure the
+largest Lyapunov exponent from the Lyapunov spectrum which describes the
+eigenvalues of the rates of expansion of a hypersphere over the infinite
+iteration of the system.  In practice, this is theoretically incalculable but
+can be reasonably approximated by actually iterating the system on 
+some randomly generated points.
+
+A module for iterating dynamical systems and measuring lyapunov exponents
+constitutes a large part of the thesis.
+
+\subsubsection{Constraint Satisfaction}
+Our fitness metric will, however, not be given a neural network and an 
+associated input signal, but instead a system of contsraints that describe
+a family of neural networks.
+
+A constraint propagation algorithm \cite{norvig}  will be applied to
+determine the number of degrees of freedom a family of networks has.
+The free variables will be randomly assigned for a large number (order ~100)
+networks.  Each network will have its lyapunov spectrum measured and the mean
+value of the largest exponent from each system will serve as the fitness metric
+for 'how chaotic are the networks in this family'.
+
+A module for solving the constraint satisfaction problem and managing instances
+of the family also constitute a large part of the proposed thesis.
+
+\subsection{Distributed Implementation}
+The constraint satisfaction problem and lyapunov spectrum measurement described
+above are both computationally expensive tasks.  To reduce runtime, the code
+portion of the proposed thesis will be implemented in python and distributed
+across idle machines in the RIT Department of Computer Science over ssh.
+
+Consequently, the authoring of an ssh job manager constitutes another, somewhat
+less major but nonetheless critical part of the proposed thesis.
+\newpage
+\section{Proposed Timeline}
+The following timeline allows two quarters to complete code, experiments and the final thesis document.
+
+Completed - No chaos in autonomous networks
+
+Completed - Thesis proposal \textit{(Pending approval and revision)}.
+
+12/15/08 - Lyapunov Approximation module completed, begin work on CSP module.
+
+01/15/09 - Constraint Satisfaction module completed, begin work on GA suite.
+
+02/15/09 - Distributed GA suite completed, begin running experiments, tweaking as necessary.
+
+04/01/09 - Finish experiments.  Begin final analysis and composition of thesis.
+
+05/??/09 - Defend.
+
+\begin{thebibliography}{widest-label}
+\bibitem{alligood}
+ K. Alligood, T. Sauer, J.A. Yorke
+ \emph{Chaos:  An Introduction to Dynamical Systems},
+ Springer-Verlag, 
+ 1997.
+\bibitem{arrowsmith}
+ D. Arrowsmith and C.M. Place,
+ \emph{An Introduction to Dynamical Systems},
+ Cambridge University Press,
+ 1990.
+\bibitem{clegg}
+ J. Clegg, J. A. Walker, and J. F. Miller,
+ \emph{A new crossover technique for Cartesian genetic programming},
+ Proceedings of the 9th annual conference on Genetic and evolutionary computation,
+ 1580-1587,
+ 2007.
+\bibitem{doya}
+ K. Doya,
+ \emph{Bifurcations in the Learning of Recurrent Neural Networks},
+ Proceedings of the 1992 IEEE International Symposium on Circuits and Systems,
+ 2777-2780,
+ 1992.
+\bibitem{devaney}
+ R. L. Devaney,
+ \emph{An Introduction to Chaotic Dynamical Systems},
+ Westview Press,
+ 2003.
+\bibitem{weigend}
+ A. Weigend and N. Gershenfeld,
+ \emph{Time Series Prediction.  Forecasting the Future and Understanding the Past},
+ Addison-Wesley,
+ 1994.
+%\bibitem{history}
+% D. Aubin and A. Dahan Dalmedico,
+% \emph{Writing the History of Dynamical Systems and Chaos:  Longue Dur\'ee and Revolution, Disciplines, and Cultures},
+% Historia Mathematica,
+% vol. 29,
+% pgs 273-339,
+% 2002.
+%\bibitem{basener}
+% W. F. Basener,
+% \emph{Topology and its Applications},
+% Wiley-Interscience,
+% 2006.
+\bibitem{dayan}
+ P. Dayan and L. F. Abbott,
+ \emph{Theoretical Neuroscience:  Computational and Mathematical Modeling of Neural Systems},
+ The MIT Press,
+ 2001.
+\bibitem{fitzhugh}
+ C. Rocsoreanu, A. Georgescu, and N. Giurgiteanu,
+ \emph{The Fitzhugh-nagumo model:  Bifurcations and Dynamics},
+ Kluwer,
+ 2000.
+\bibitem{hirsch}
+ M. W. Hirsch, S. Smale, R. L. Devaney,
+ \emph{Differential Equations, Dynamical System, and an Introduction to Chaos},
+ Elsevier,
+ 2004.
+\bibitem{izhikevich_book}
+ E. Izhikevich,
+ \emph{Dynamical Systems in Neuroscience:  The Geometry of Excitability and Bursting},
+ The MIT Press,
+ 2007.
+\bibitem{maass_what_makes}
+ R. Legenstein and W. Maass,
+ \emph{What makes a dynamical system computationally powerful?}
+ Haykin, Principe, Sejnowski, and McWhirter:
+ New Directions in Statistical Signal Processing:  From Systems to Brain
+ 2005.
+\bibitem{maass_metaphor}
+ T. Natschl\"ager, W. Maass, H. Markram,
+ \emph{The "Liquid Computer":  A Novel Strategy for Real-Time Computing on Time Series}
+  Special Issue on Foundations of Information Processing of TELEMATIK, 
+  vol. 8, 
+  num. 1, 
+  p. 39-43,
+  2002 
+\bibitem{maass_book}
+ W. Maass and C. M. Bishop,
+ \emph{Pulsed Neural Networks},
+ The MIT Press,
+ 1999.
+\bibitem{maass_original}
+ W. Maass, T. Natschl\"ager, and H. Markram,
+ \emph{A Model for Real-Time Computation in Generic Neural Microcircuits},
+ Proc. of NIPS 2002, 
+ Advances in Neural Information Processing Systems, 
+ volume 15, 
+ pages 229-236. 
+ MIT Press, 
+ 2003.
+\bibitem{norvig}
+ S. Russell and P. Norvig,
+ \emph{Artificial Intelligence: A Modern Approach},
+ Prentice Hall,
+ 1995.
+\bibitem{jaeger_original}
+  H. Jaeger,
+  \emph{The "echo state" approach to analysing and training recurrent neural networks}. 
+  GMD Report 148, 
+  GMD - German National Research Institute for Computer Science,
+  2001.
+\bibitem{verstraeten}
+ D. Verstraeten, B. Scharuwen, M. D'Haene, D. Stroobandt,
+ \emph{An experimental unification of reservoir computing methods},
+ Neural Networks,
+ vol. 20,
+ pgs 391-403,
+ 2007.
+\end{thebibliography}
+
+\end{document}
+
