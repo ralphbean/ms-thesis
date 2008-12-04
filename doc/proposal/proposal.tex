@@ -462,11 +462,9 @@ experimentally determining how chaotic the system is is to measure the
 largest Lyapunov exponent from the Lyapunov spectrum which describes the
 eigenvalues of the rates of expansion of a hypersphere over the infinite
 iteration of the system.  In practice, this is theoretically incalculable but
-can be reasonably approximated by actually iterating the system on 
-some randomly generated points.
-
-A module for iterating dynamical systems and measuring lyapunov exponents
-constitutes a large part of the thesis.
+can be reasonably approximated by numerically iterating the system on 
+some randomly generated points\cite{sprott}.  This component of the thesis
+has already been completed and tested against values in the literature.
 
 \subsubsection{Constraint Satisfaction}
 Our fitness metric will, however, not be given a neural network and an 
@@ -499,7 +497,7 @@ Completed - No chaos in autonomous networks
 
 Completed - Thesis proposal \textit{(Pending approval and revision)}.
 
-12/15/08 - Lyapunov Approximation module completed, begin work on CSP module.
+Completed - System simulation and lyapunov approximation module.
 
 01/15/09 - Constraint Satisfaction module completed, begin work on GA suite.
 
@@ -607,6 +605,11 @@ Completed - Thesis proposal \textit{(Pending approval and revision)}.
  \emph{Artificial Intelligence: A Modern Approach},
  Prentice Hall,
  1995.
+\bibitem{sprott}
+ J. C. Sprott,
+ \emph{Chaos and Time Series Analysis},
+ Oxford University Press,
+ 2003.
 \bibitem{jaeger_original}
   H. Jaeger,
   \emph{The "echo state" approach to analysing and training recurrent neural networks}. 
