@@ -75,17 +75,5 @@ def measure_lyapunov(
                 quotient = quotient + epsilon
             total = total + log( quotient )
 
-    return total / measurement_iterations 
-
-# Little test stub which yields values consistent with those in the literature.
-def test_lyapunov():
-    some_test_values = [1, 1.9, 1.999, 2, 2.001, 2.1, 3, 
-                        3.236067977, 3.5699456720, 
-                        3.56994571869, 3.828427125, 
-                        3.9, 4]
-    for i in some_test_values:
-        logistic_example_system['consts'][0] = i
-        print i, ":"
-        print "", measure_lyapunov(logistic_example_system, 2000, 4000, 1)
-
+    return total / (measurement_iterations * trials) 
 
