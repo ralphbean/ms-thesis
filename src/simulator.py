@@ -48,7 +48,7 @@ def measure_lyapunov(
     epsilon = 1e-6
     total = 0
     for i in range(trials):
-        # Randmoly generate a n-dimensional initial seed
+        # Randomly generate a n-dimensional initial seed
         x = [random() for j in range(system['n'])]
 
         for j in range(warmup_iterations):
