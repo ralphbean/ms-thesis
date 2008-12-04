@@ -12,7 +12,7 @@ logistic_example_system = {
         'n' : 1,
 
         # A list of the values of constants (referenced elsewhere by index)
-        'consts' : [4],
+        'consts' : [3.9],
 
         # A python list of lambda expressions.  Every lambda expression 
         #  takes two parameters, a list of constant values and a list of
@@ -27,7 +27,6 @@ logistic_example_system = {
 #  encoded in the system dictionary are applied to x and the subsequent image
 #  it returned.
 def iterate(system, x):
-    print x
     return [system['eqns'][i](x, system['consts']) for i in range(system['n'])]
 
 
@@ -46,56 +45,47 @@ def measure_lyapunov(
         measurement_iterations=5,
         trials=1):
 
+    epsilon = 1e-6
     total = 0
     for i in range(trials):
-        print i
-
         # Randmoly generate a n-dimensional initial seed
         x = [random() for j in range(system['n'])]
 
         for j in range(warmup_iterations):
             x = iterate(system, x)
 
+        # First, generate a random point that is a distance of d0 from x
+        d0 = 0.0000000001
+        y = [random() + x[k] for k in range(system['n'])]
+
         for j in range(measurement_iterations):
-            # TODO -- instead of picking a random point.. pick one based on
-            #  an orthonormalization of the system (re:  Chaos and Time-Series
-            #  Analysis by J.C. Sprott
-
-
-            # Now we begin measuring.
-            # First, generate a random point that is a distance of d0 from x
-            d0 = 0.0000000001
-            y = [random() for k in range(system['n'])]
-
-            ymag = sqrt(sum([ele**2 for ele in y]))         # Get the size of y
-            y = [d0 * ele / ymag for ele in y]              # Scale y
-            y = [y[k] + x[k] for k in range(system['n'])]   # Translate y to x
-
-            # Sanity check:  # TODO -- we can remove this...
-            d1 = sqrt(sum([(x[k]-y[k])**2 for k in range(system['n'])]))
-            print "sanity check: ", d0, d1
-            epsilon = 1e-6
-            assert( fabs(d0-d1) < epsilon )
-
+            y = [y[k] - x[k] for k in range(system['n'])]  # Translate y from x
+            ymag = sqrt(sum([ele**2 for ele in y]))        # Get the size of y
+            if ( ymag == 0 ):
+                ymag = ymag + epsilon
+            y = [d0 * ele / ymag for ele in y]             # Scale y
+            y = [y[k] + x[k] for k in range(system['n'])]  # Translate y to x
 
             # Okay -- actually iterate the two values.
             x = iterate(system, x)
             y = iterate(system, y)
             d1 = sqrt(sum([(x[k]-y[k])**2 for k in range(system['n'])]))
-            total = total + log( fabs( d1/d0 ) )
+            quotient = fabs( d1/d0 )
+            if ( quotient == 0 ):
+                quotient = quotient + epsilon
+            total = total + log( quotient )
 
-            # TODO -- readjust the orbit so it is d0 away in the direction of d1
-
-    print total
-    print total/measurement_iterations
     return total / measurement_iterations 
 
-# Little test stub
+# Little test stub which yields values consistent with those in the literature.
 def test_lyapunov():
-    spectrum = measure_lyapunov(logistic_example_system, 200, 2000, 1)
-    print "Finished:"
-    print spectrum
+    some_test_values = [1, 1.9, 1.999, 2, 2.001, 2.1, 3, 
+                        3.236067977, 3.5699456720, 
+                        3.56994571869, 3.828427125, 
+                        3.9, 4]
+    for i in some_test_values:
+        logistic_example_system['consts'][0] = i
+        print i, ":"
+        print "", measure_lyapunov(logistic_example_system, 2000, 4000, 1)
 
-# Call the test stub
-test_lyapunov()
 
