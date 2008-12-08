@@ -3,14 +3,29 @@
 # constraint.py is a module that deals with systems of contraints and inputs
 #  and can instantiate satisfactory systems
 
+
+# Takes a tree as a dictionary and prints its nodes inorder
+def tree_to_inorder_string(root):
+    retval = ""
+    if ( root.__contains__('left') ):
+        retval = retval + tree_to_inorder_string(root['left'])
+    retval = retval + root['data']
+    if ( root.__contains__('right') ):
+        retval = retval + tree_to_inorder_string(root['right'])
+    return retval
+
 # Takes the dictionary structure of a set of contraints and prints them in
 #  human-readable form
-def print_constraints( constraints ):
-    print "TODO"
+def constraints_to_string( constraints ):
+    n = constraints['n']
+    retval = "Constraints.   n =" + n
+    for c in constraints:
+        retval = retval + "\n" + tree_to_inorder_string(c)
+    return retval
 
 # Takes the dictionary structure of a system input and prints it in
 #  human-readable form
-def print_input( input ):
+def input_to_string( input ):
     print "TODO"
 
 # Returns true if a system satisfies the given set of constraints and associated
