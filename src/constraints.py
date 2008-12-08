@@ -9,17 +9,29 @@ def tree_to_inorder_string(root):
     retval = ""
     if ( root.__contains__('left') ):
         retval = retval + tree_to_inorder_string(root['left'])
-    retval = retval + root['data']
+
+    data = root['data']
+    # Data can be either a variable, constant, or operator
+    if data['type'] == 'operator':
+        retval = retval + data['value']
+    elif data['type'] == 'parameter':
+        retval = retval + "a_{" + data['value'] + "}"
+    elif data['type'] == 'constant':
+        retval = retval + data['value']
+    else:
+        raise ValueError, "Undefined data type in inorder traversal."
+
     if ( root.__contains__('right') ):
         retval = retval + tree_to_inorder_string(root['right'])
+
     return retval
 
 # Takes the dictionary structure of a set of contraints and prints them in
 #  human-readable form
 def constraints_to_string( constraints ):
     n = constraints['n']
-    retval = "Constraints.   n =" + n
-    for c in constraints:
+    retval = "Constraints.   n =" + str(n)
+    for c in constraints['eqns']:
         retval = retval + "\n" + tree_to_inorder_string(c)
     return retval
 
