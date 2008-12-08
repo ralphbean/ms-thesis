@@ -372,10 +372,12 @@ approach would measure the difference of the same subjects' reaction to
 stimuli which differ only slightly, the approach proposed here would measure
 the difference of the same subjects' reaction to the \textit{same} stimuli
 when primed by slightly different sets of stimuli preceeding the measurement.
-
+\newpage
 \section{Genetic Algorithm}
 A purely analytic approach was taken in the above section on autonomous 
-artificial neural networks.  The introduction of an input signal into the
+artificial neural networks.  However, artificial neural networks without any
+input from an environment are usually of only toy interest.  
+The introduction of an input signal into the
 work presents challenges which make analytic results beyond the scope of a
 M.S. thesis.  Consequently, a genetic algorithm is proposed with
 the express purpose of suggesting direction for future analytic research.
@@ -403,20 +405,24 @@ Typically, the fitness is how well the network achieves the desired behavior
 in a simulation.  In our case this is not enough and is where the proposed
 thesis takes on its novel character.
 
-In Maass' publications \cite{maass_original}, 
+In Maass' publications \cite{maass_original},
 networks are randomly searched for
 that meet the necessary criteria.  Jaeger provides a stochastic method for
-constructing networks \cite{jaeger_original}.  
+constructing networks \cite{jaeger_original}.
+
 The goal of this genetic algorithm will
 be to evolve, not a neural network, but a system of equations that define
-constraints on a neural network and its input, that define a 
-\textit{family} of neural networks and inputs.  The hope is that the product
+constraints on a neural network and its input -- constraints that define a
+\textit{family} of neural networks and inputs.  Jaeger and Maass have
+experimentally shown that chaotic networks are of interest and have suggested
+stochastic constructions methods.  Here we lean on a stochastic method (the GA)
+to produce and suggest a deterministic construction method (the set of 
+constraints).
+
+Furthermore, the hope is that the product
 of simulated evolution will provide clues as to just what it is about 
 certain neural networks and their associated inputs that produces
-chaotic behavior
-and what role chaos can play in computing theory.  This thesis began
-analytically and here moves towards experiment, but experiment directed
-expressly at future analytic attempts. 
+chaotic behavior and what role chaos can play in computing theory.
 
 \subsection{Representation}
 Organisms in the proposed genetic algorithm consist of a description of the
@@ -427,7 +433,7 @@ The most managable genetic representation of variable length individuals is
 a binary tree.  Elements of the tree are either binary operators, variable
 symbolic operands, or constants.  Two trees will be needed to describe 
 individuals:  one for the system of contraints on the weight matrix, and 
-another for the expression of the input signal.  
+another for the expression of the input signal.
 
 Operators include all the arithmetic operators:  addition, subtraction, multiplication, division, and exponentiation as well as trigonometric functions for the
 input signal only.
@@ -449,8 +455,8 @@ will be applied here as well and compared to the simpler first proposed method.
 \subsection{Mutation}
 Mutation on individuals represented as trees will amount to a random choice of 
 a few operations:  Random pruning of subtrees, random generation of an 
-addition of new subtrees, and random flipping of bits in symbolic variables 
-and constants.
+additional additional subtree, and random flipping of bits in symbolic 
+variables and constants.
 
 \subsection{Fitness Metric}
 The fitness metric is the most complex aspect of this approach and encapsulates
@@ -464,7 +470,8 @@ eigenvalues of the rates of expansion of a hypersphere over the infinite
 iteration of the system.  In practice, this is theoretically incalculable but
 can be reasonably approximated by numerically iterating the system on 
 some randomly generated points\cite{sprott}.  This component of the thesis
-has already been completed and tested against values in the literature.
+has already been completed and successfully tested on canonical systems
+against values in the literature.
 
 \subsubsection{Constraint Satisfaction}
 Our fitness metric will, however, not be given a neural network and an 
@@ -489,7 +496,7 @@ across idle machines in the RIT Department of Computer Science over ssh.
 
 Consequently, the authoring of an ssh job manager constitutes another, somewhat
 less major but nonetheless critical part of the proposed thesis.
-\newpage
+
 \section{Proposed Timeline}
 The following timeline allows two quarters to complete code, experiments and the final thesis document.
 
