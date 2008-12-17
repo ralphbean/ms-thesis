@@ -61,7 +61,7 @@ def instantiate( constraints, input, num_copies=1 ):
     # http://en.wikipedia.org/wiki/Gaussian_elimination
     A = linalg.gaussianElim(A)
 
-    n_free = linalg.numberOfFreeVariables(A)
+    free_v = linalg.determineFreeVariables(A)
 
     for i in range(num_copies):
         assignments = [random() for i in range(n_free)]
@@ -69,6 +69,8 @@ def instantiate( constraints, input, num_copies=1 ):
         solution = linalg.backsolve(A, assignments)
 
         # TODO -- turn solution into a system
+
+        # TODO -- append the input item
 
         # TODO -- append system to list of systems
 

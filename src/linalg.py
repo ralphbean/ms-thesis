@@ -106,6 +106,7 @@ def someTests():
         print "V:", V
         print "det(C):", det(C),
         print "Inconsistent?: ", inconsistent(B),
-        n = determineFreeVariables(A)
-        print "n: ", n
+        n = determineFreeVariables(B)
+        print "free: ", n
+
 someTests()
