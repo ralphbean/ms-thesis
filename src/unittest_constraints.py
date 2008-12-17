@@ -53,8 +53,6 @@ class TestConstraints(unittest.TestCase):
         s = constraints.input_to_string(self.input)
         self.assertTrue(s == "x0:0\ndx:1\n(a_{1}*(3+2))")
 
-    def testIterateInput(self):
-        pass
     def testSatisfactory(self):
         pass
     def testInstantiate(self):
