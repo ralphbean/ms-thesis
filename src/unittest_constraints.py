@@ -5,25 +5,16 @@ import constraints
 
 class TestConstraints(unittest.TestCase):
     def setUp(self):
-        self.system = { 'n' : 2,
-                'eqns' : [
-                    { 'data'  :
-                        {'type'  : 'operator',
-                         'value' : '='},
-                      'left'  : { 'data' : 
-                                    { 'type' : 'parameter',
-                                      'value' : '1' }},
-                      'right' : { 
-                          'data' : {'type'  : 'operator',
-                         'value' : '+'},
-                                  'left' : { 'data' : 
-                                      {'type' : 'constant',
-                                          'value' : '1'}
-                                      },
-                                  'right': { 'data' : 
-                                      {'type' : 'constant',
-                                          'value' : '2'}
-                                      }}}]}
+        self.constraints = [
+                [
+                    [ 0, 0, 0, 1 ],
+                    [ 0, 2, 3, 0 ],
+                    [ 1, 0, 1, 0 ],
+                    [ 2, 2, 3, 4 ]
+                ],
+                [ 1, 2, 3, 4 ]
+                ]
+        self.system = 
         self.input = {  'x0'  : 0,
                         'dx'  : 1,
                         'eqn' :
@@ -45,12 +36,9 @@ class TestConstraints(unittest.TestCase):
                                           'value' : '2'}
                                       }}}}
 
-    def testPrintConstraints(self):
-        s = constraints.constraints_to_string(self.system)
-        self.assertTrue(s == "n:2\n(a_{1}=(1+2))")
-
     def testPrintInput(self):
         s = constraints.input_to_string(self.input)
+        print s
         self.assertTrue(s == "x0:0\ndx:1\n(a_{1}*(3+2))")
 
     def testSatisfactory(self):
