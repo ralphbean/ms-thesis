@@ -18,30 +18,18 @@ def gaussianElim(A):
     i = 0
     j = 0
     while (i < m and j < n ):
-        print "A: ",i,j
-        for row in A:
-            print row
-        # Find pivot in column j starting in row i:
-        maxi = i
-        for k in range(i+1, m):
-            if fabs(A[k][j]) > fabs(A[maxi][j]):
-                maxi = k
-        if not A[maxi][j] == 0:
-            # Swap rows i and maxi, but do not change the value of i
-            swp = A[i]
-            A[i] = A[maxi]
-            A[maxi] = swp
+        if not A[i][j] == 0:
             # Divide each entry in row i by A[i][j]
             a_ij = float(A[i][j])
             A[i] = [col/a_ij for col in A[i]]
+
             # Now A[i,j] will have the value 1.
             assert(A[i][j] == 1)
+
             for u in range(i+1, m):
-                print "A: ",i,j
-                for row in A:
-                    print row
                 # subtract A[u,j] * row i from row u
                 A[u] = [A[u][c] - (A[u][j]*A[i][c]) for c in range(len(A[u]))]
+
                 # Now A[u,j] will be 0,
                 #  since A[u,j] - A[i,j] * A[u,j] = A[u,j] - 1 * A[u,j] = 0
                 assert(A[u][j] == 0)
@@ -59,25 +47,66 @@ def numberOfFreeVariables(A):
     m = len(A)
     n = len(A[0])
 
+    if not m == n:
+        raise "A is not square.  Fine in general.. but not for this program."
 
+    count = 0
+    for i in range(n):
+        if A[i][i] == 0:
+            count = count + 1
+
+    return count
+
+def inconsistent(A):
+    for row in A:
+        possible = True
+        for ele in row[:-1]:
+            if not ele == 0:
+                possible = False
+        if possible:
+            if not row[-1] == 0:
+                return True
+    return False
 
 
 def backsolve(A, assignments):
     raise "Unimplemented."
 
-A = [
-        [ 9,3,4,7],
-        [ 4,3,4,8],
-        [ 1,1,1,3]
-    ]
-B = gaussianElim(A)
-#n = numberOfFreeVariables(A)
-C = [row[:-1] for row in B]
-V = [row[-1] for row in B]
-print "C:"
-for row in C:
-    print row
-print "V:"
-for row in V:
-    print row
-
+def someTests():
+    As = [[
+            [ 1, 1, 1, 3 ],
+            [ 2, 3, 7, 0 ],
+            [ 1, 3, -2, 17 ]
+        ],[
+            [ 9,3,4,7],
+            [ 4,3,4,8],
+            [ 1,1,1,3]
+        ],[
+            [2, 1, -1, 8],
+            [-3,-1,2,-11],
+            [-2,1,2,-3]
+        ],[
+            [2, 4, 5, 47],
+            [3, 10, 11, 104],
+            [3, 2, 4, 37]
+        ],[
+            [1,2,4],
+            [2,4,9]
+        ]]
+    for A in As:
+        print
+        print "Original A"
+        for row in A:
+            print row
+        B = gaussianElim(A)
+        C = [row[:-1] for row in B]
+        V = [row[-1] for row in B]
+        print "C:"
+        for row in C:
+            print row
+        print "V:", V
+        print "det(C):", det(C),
+        print "Inconsistent?: ", inconsistent(B),
+        n = numberOfFreeVariables(A)
+        print "n: ", n
+someTests()
