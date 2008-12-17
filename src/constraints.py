@@ -62,14 +62,14 @@ def instantiate( constraints, input, num_copies=1 ):
     A = linalg.gaussianElim(A)
 
     n_free = linalg.numberOfFreeVariables(A)
-    raise "free vars"
 
     for i in range(num_copies):
         assignments = [random() for i in range(n_free)]
 
         solution = linalg.backsolve(A, assignments)
-        raise "solution"
+
         # TODO -- turn solution into a system
+
         # TODO -- append system to list of systems
 
 
