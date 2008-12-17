@@ -38,8 +38,9 @@ def gaussianElim(A):
         j = j + 1
     return A
 
-# This function assumes A is already in row-echelon form
-def numberOfFreeVariables(A):
+# This function assumes A is already in row-echelon form and returns a list
+#  of the indices of the free variables.
+def determineFreeVariables(A):
     # Strip off the column vector
     V = [row[-1] for row in A]
     A = [row[:-1] for row in A]
@@ -49,13 +50,11 @@ def numberOfFreeVariables(A):
 
     if not m == n:
         raise "A is not square.  Fine in general.. but not for this program."
-
-    count = 0
+    free = []
     for i in range(n):
         if A[i][i] == 0:
-            count = count + 1
-
-    return count
+            free = free + [i]
+    return free
 
 def inconsistent(A):
     for row in A:
@@ -107,6 +106,6 @@ def someTests():
         print "V:", V
         print "det(C):", det(C),
         print "Inconsistent?: ", inconsistent(B),
-        n = numberOfFreeVariables(A)
+        n = determineFreeVariables(A)
         print "n: ", n
 someTests()
