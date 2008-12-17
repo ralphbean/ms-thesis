@@ -50,6 +50,11 @@ def gaussianElim(A):
         j = j + 1
     return A
 
+def numberOfFreeVariables(A):
+    raise "Unimplemented."
+
+def backsolve(A, assignments):
+    raise "Unimplemented."
 
 A = [
         [ 9,3,4,7],
