@@ -48,8 +48,6 @@ def input_to_string( input ):
     s = s + tree_to_inorder_string(input['eqn'])
     return s
 
-
-
 # Returns true if a system satisfies the given set of constraints and associated
 #  input
 def satisfactory( system, constraints, input ):
