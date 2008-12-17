@@ -52,6 +52,9 @@ def instantiate( constraints, input ):
     V = constraints[1]
     if linalg.det(M) == 0:
         raise "Unsatisfiable."
+    # TODO -- write this using:
+    # http://en.wikipedia.org/wiki/Gaussian_elimination
+
 
 
     return {}
