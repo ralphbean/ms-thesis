@@ -50,8 +50,17 @@ def gaussianElim(A):
         j = j + 1
     return A
 
+# This function assumes A is already in row-echelon form
 def numberOfFreeVariables(A):
-    raise "Unimplemented."
+    # Strip off the column vector
+    V = [row[-1] for row in A]
+    A = [row[:-1] for row in A]
+
+    m = len(A)
+    n = len(A[0])
+
+
+
 
 def backsolve(A, assignments):
     raise "Unimplemented."
@@ -62,6 +71,7 @@ A = [
         [ 1,1,1,3]
     ]
 B = gaussianElim(A)
+#n = numberOfFreeVariables(A)
 C = [row[:-1] for row in B]
 V = [row[-1] for row in B]
 print "C:"
@@ -70,3 +80,4 @@ for row in C:
 print "V:"
 for row in V:
     print row
+
