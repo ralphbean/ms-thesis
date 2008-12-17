@@ -1,6 +1,6 @@
 #!/usr/bin/python
 from math import fabs
-
+from random import random
 # This is recursive
 def det(A, modifier=1):
     if ( len(A) == 2 ):
@@ -68,8 +68,30 @@ def inconsistent(A):
     return False
 
 
+# Backsolve returns a vector of length n containing assignments for
+#  every variable in the system described by A.
+# Assignments is a dictionary (potentially empty) mapping free variable indices
+#  to some random values
 def backsolve(A, assignments):
-    raise "Unimplemented."
+    V = [row[-1] for row in A]
+    A = [row[:-1] for row in A]
+    solution = {}
+    for i in range(len(A)-1,-1,-1):
+        if i in assignments.keys():
+            solution[i] = assignments[i]
+        else:
+            sum = 0
+            for j in range(i,len(A[i])):
+                if A[i][j] == 0:
+                    assert(False)
+                    continue # Should never get here.
+                if j == i:
+                    assert A[i][j] == 1
+                    continue # Assume the diagonal is 1
+                sum = sum + (A[i][j] * solution[j])
+            solution[i] = V[i] - sum
+    assert(len(solution.keys()) == len(A))
+    return solution
 
 def someTests():
     As = [[
@@ -108,5 +130,11 @@ def someTests():
         print "Inconsistent?: ", inconsistent(B),
         n = determineFreeVariables(B)
         print "free: ", n
+        free = {}
+        for free_var in n:
+            free[free_var] = random()
+            print "Free variable assignment:", free_var,"->",free[free_var]
+
+        print "solution:", backsolve(B, free)
 
 someTests()

@@ -56,15 +56,17 @@ def instantiate( constraints, input, num_copies=1 ):
     A = [row for row in M]
 
     # Append the column vector
-    A = [A[i] + V[i] for i in range(len(A))]
+    A = [A[i] + [V[i]] for i in range(len(A))]
 
     # http://en.wikipedia.org/wiki/Gaussian_elimination
     A = linalg.gaussianElim(A)
 
-    free_v = linalg.determineFreeVariables(A)
+    free_vars = linalg.determineFreeVariables(A)
 
     for i in range(num_copies):
-        assignments = [random() for i in range(n_free)]
+        assignments = {}
+        for var in free_vars:
+            assignments[var] = random()
 
         solution = linalg.backsolve(A, assignments)
 
