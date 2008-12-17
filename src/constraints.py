@@ -55,12 +55,23 @@ def instantiate( constraints, input, num_copies=1 ):
     # Make a copy
     A = [row for row in M]
 
+    # Append the column vector
+    A = [A[i] + V[i] for i in range(len(A))]
+
     # http://en.wikipedia.org/wiki/Gaussian_elimination
-    S,T = linalg.gaussianElim(M)
+    A = linalg.gaussianElim(A)
+
+    n_free = linalg.numberOfFreeVariables(A)
+    raise "free vars"
+
+    for i in range(num_copies):
+        assignments = [random() for i in range(n_free)]
+
+        solution = linalg.backsolve(A, assignments)
+        raise "solution"
+        # TODO -- turn solution into a system
+        # TODO -- append system to list of systems
 
 
     return {}
 
-# Eliminates redundancy and reorganizes a set of contraints to be... simpler.
-def simplify( constraints ):
-    return constraints
