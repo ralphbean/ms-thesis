@@ -37,8 +37,7 @@ def tree_to_inorder_string(root):
 # Takes the dictionary structure of a system input and prints it in
 #  human-readable form
 def input_to_string( input ):
-    s = "x0:" + str(input['x0']) + "\n"
-    s = s + "dx:" + str(input['dx']) + "\n"
+    s = "x0:" + str(input['x0']) + "\ndx:" + str(input['dx']) + "\n"
     s = s + tree_to_inorder_string(input['eqn'])
     return s
 
@@ -47,14 +46,17 @@ def input_to_string( input ):
 #  resulting system.
 #
 # Raises an exception if the set of contraints is unsatisfiable!
-def instantiate( constraints, input ):
+def instantiate( constraints, input, num_copies=1 ):
     M = constraints[0]
     V = constraints[1]
     if linalg.det(M) == 0:
         raise "Unsatisfiable."
-    # TODO -- write this using:
-    # http://en.wikipedia.org/wiki/Gaussian_elimination
 
+    # Make a copy
+    A = [row for row in M]
+
+    # http://en.wikipedia.org/wiki/Gaussian_elimination
+    S,T = linalg.gaussianElim(M)
 
 
     return {}
