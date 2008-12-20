@@ -37,15 +37,16 @@ def someTests():
             print row
         print "V:", V
         print "det(C):", det(C),
-        print "Inconsistent?: ", inconsistent(B),
+        print ",  Inconsistent?: ", inconsistent(B),
         n = determineFreeVariables(B)
-        print "free: ", n
+        print ",  free: ", n
         free = {}
         for free_var in n:
             free[free_var] = random()
             print "Free variable assignment:", free_var,"->",free[free_var]
 
         print "solution:", backsolve(B, free)
+
 
 someTests()
 
