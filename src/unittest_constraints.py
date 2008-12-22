@@ -15,7 +15,7 @@ class TestConstraints(unittest.TestCase):
                 [ 1, 2, 3, 4 ]
                 ]
         self.system = 
-        self.input = {  'x0'  : 0,
+        self.input = {
                         'dx'  : 1,
                         'eqn' :
                     { 'data'  :
@@ -39,7 +39,7 @@ class TestConstraints(unittest.TestCase):
     def testPrintInput(self):
         s = constraints.input_to_string(self.input)
         print s
-        self.assertTrue(s == "x0:0\ndx:1\n(a_{1}*(3+2))")
+        self.assertTrue(s == "dx:1\n(a_{1}*(3+2))")
 
     def testSatisfactory(self):
         pass

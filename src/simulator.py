@@ -1,6 +1,6 @@
 #!/usr/bin/python
 from random import random
-from math import sqrt, fabs, log
+from math import sqrt, fabs, log, tanh
 
 # The simulator module contains a few functions for simulating arbitrary
 #  *discrete* dynamical systems and approximating their lyapunov spectrums.
