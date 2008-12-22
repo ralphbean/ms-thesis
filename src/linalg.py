@@ -1,6 +1,7 @@
 #!/usr/bin/python
 from math import fabs
 
+epsilon = 10**-12
 # This is recursive
 def det(A, modifier=1):
     if ( len(A) == 2 ):
@@ -18,7 +19,18 @@ def gaussianElim(A):
     i = 0
     j = 0
     while (i < m and j < n ):
-        if not A[i][j] == 0:
+        # Find pivot in column j, starting in row i:
+        maxi = i
+        for k in range(i+1, m):
+            if fabs(A[k][j]) > fabs(A[maxi][j]):
+                maxi = k
+
+        if not A[maxi][j] == 0:
+            # Swap rows i and maxi but do not change the value of i
+            swp = A[i]
+            A[i] = A[maxi]
+            A[maxi] = swp
+
             # Divide each entry in row i by A[i][j]
             a_ij = float(A[i][j])
             A[i] = [col/a_ij for col in A[i]]
@@ -29,6 +41,11 @@ def gaussianElim(A):
             for u in range(i+1, m):
                 # subtract A[u,j] * row i from row u
                 A[u] = [A[u][c] - (A[u][j]*A[i][c]) for c in range(len(A[u]))]
+                for k in range(len(A[u])):
+                    if ( A[u][k] != 0 and 
+                            A[u][k] < epsilon and 
+                            A[u][k] > -epsilon ):
+                        A[u][k] = 0
 
                 # Now A[u,j] will be 0,
                 #  since A[u,j] - A[i,j] * A[u,j] = A[u,j] - 1 * A[u,j] = 0
@@ -37,6 +54,15 @@ def gaussianElim(A):
             i = i + 1
         j = j + 1
     return A
+
+def is_upper_triangular(A):
+    ret = True 
+    for i in range(0, len(A)):
+        for j in range(0, i-1):
+            if A[i][j] != 0:
+                ret = ret and False 
+    return ret
+
 
 # This function assumes A is already in row-echelon form and returns a list
 #  of the indices of the free variables.
@@ -82,9 +108,6 @@ def backsolve(A, assignments):
         else:
             sum = 0
             for j in range(i,len(A[i])):
-                if A[i][j] == 0:
-                    assert(False)
-                    continue # Should never get here.
                 if j == i:
                     assert A[i][j] == 1
                     continue # Assume the diagonal is 1

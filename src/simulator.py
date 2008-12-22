@@ -27,7 +27,15 @@ logistic_example_system = {
 #  encoded in the system dictionary are applied to x and the subsequent image
 #  it returned.
 def iterate(system, x):
-    return [system['eqns'][i](x, system['consts']) for i in range(system['n'])]
+    next = []
+    for i in range(system['n']):
+        try:
+            val = system['eqns'][i](x, system['consts'])
+        except StandardError, e:
+            val = 0 # Division by zero or (-1)^(1/2)
+        next.append(val)
+    return next
+    #return [system['eqns'][i](x, system['consts']) for i in range(system['n'])]
 
 
 # The measure_lyapunov function takes a system and returns the largest lyapunov
@@ -41,9 +49,9 @@ def iterate(system, x):
 #      system while approximating the lyapunov spectrum.
 def measure_lyapunov(
         system,
-        warmup_iterations=5,
-        measurement_iterations=5,
-        trials=1):
+        warmup_iterations=500,
+        measurement_iterations=1000,
+        trials=8):
 
     epsilon = 1e-6
     total = 0
@@ -74,6 +82,6 @@ def measure_lyapunov(
             if ( quotient == 0 ):
                 quotient = quotient + epsilon
             total = total + log( quotient )
-
-    return total / (measurement_iterations * trials) 
+    lyap = total / (measurement_iterations * trials)
+    return lyap
 

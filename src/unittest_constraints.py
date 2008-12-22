@@ -1,52 +1,20 @@
 #!/usr/bin/python
 
 import unittest
+import simulator
 import constraints
+import inputs
+from random import randint
 
 class TestConstraints(unittest.TestCase):
-    def setUp(self):
-        self.constraints = [
-                [
-                    [ 0, 0, 0, 1 ],
-                    [ 0, 2, 3, 0 ],
-                    [ 1, 0, 1, 0 ],
-                    [ 2, 2, 3, 4 ]
-                ],
-                [ 1, 2, 3, 4 ]
-                ]
-        self.system = 
-        self.input = {
-                        'dx'  : 1,
-                        'eqn' :
-                    { 'data'  :
-                        {'type'  : 'operator',
-                         'value' : '*'},
-                      'left'  : { 'data' : 
-                                    { 'type' : 'parameter',
-                                      'value' : '1' }},
-                      'right' : { 
-                          'data' : {'type'  : 'operator',
-                         'value' : '+'},
-                                  'left' : { 'data' : 
-                                      {'type' : 'constant',
-                                          'value' : '3'}
-                                      },
-                                  'right': { 'data' : 
-                                      {'type' : 'constant',
-                                          'value' : '2'}
-                                      }}}}
-
-    def testPrintInput(self):
-        s = constraints.input_to_string(self.input)
-        print s
-        self.assertTrue(s == "dx:1\n(a_{1}*(3+2))")
-
-    def testSatisfactory(self):
-        pass
     def testInstantiate(self):
-        pass
-    def testSimplify(self):
-        pass
+        # TODO -- come up with a real test here (or series of tests.
+        n = 2**2
+        A = [[randint(-1,2) for j in range(n+1)] for i in range(n)]
+        input = inputs.build_random_input()
+
+        networks = constraints.instantiate(A, input)
+        lyaps = [simulator.measure_lyapunov(network) for network in networks]
 
 
 def suite():
