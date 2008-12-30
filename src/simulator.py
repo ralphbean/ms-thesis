@@ -49,8 +49,8 @@ def iterate(system, x):
 #      system while approximating the lyapunov spectrum.
 def measure_lyapunov(
         system,
-        warmup_iterations=500,
-        measurement_iterations=1000,
+        warmup_iterations=25,
+        measurement_iterations=50,
         trials=8):
 
     epsilon = 1e-6

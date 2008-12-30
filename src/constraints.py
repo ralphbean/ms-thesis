@@ -18,20 +18,18 @@ def instantiate( constraints, input, num_copies=1 ):
     A = [row for row in constraints]    # Make a copy.
 
     if linalg.inconsistent(A):
-        raise "Unsatisfiable."
+        raise Exception, "Unsatisfiable."
 
     # http://en.wikipedia.org/wiki/Gaussian_elimination
-    #print "Doing gaussian elimination for instantiation."
     A = linalg.gaussianElim(A)
 
     free_vars = linalg.determineFreeVariables(A)
-    #print "Num free vars:", len(free_vars)
 
     networks = [] # List to return
     for i in range(num_copies):
         assignments = {}
         for var in free_vars:
-            assignments[var] = random()
+            assignments[var] = random()*20 - 10
 
         solution = linalg.backsolve(A, assignments)
 
@@ -48,4 +46,8 @@ def instantiate( constraints, input, num_copies=1 ):
                 }
         networks.append(network)
     return networks 
+
+# n is the size of the neural net
+def build_random_constraints(n):
+    return [[random()*20 - 10 for j in range(n**2 + 1)] for i in range(n**2)]
 

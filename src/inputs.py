@@ -1,5 +1,23 @@
 from random import random, randint
 
+ops = { '^' : (lambda x,y : x**y),
+        '*' : (lambda x,y : x * y),
+        '/' : (lambda x,y : x / y),
+        '+' : (lambda x,y : x + y),
+        '-' : (lambda x,y : x - y)}
+
+# TODO - crossover
+def crossover(i1, i2):
+    return i1
+
+def mutate(input):
+    input['eqn'] = _mutate(input['eqn'])
+    return input
+
+def _mutate(root):
+    # TODO -- recursive mutation on the function tree
+    return root
+
 # Takes a tree as a dictionary and prints its nodes inorder
 def tree_to_inorder_string(root):
     retval = ""
@@ -32,11 +50,6 @@ def input_to_string( input ):
     s = "f(a_{0}) = " + tree_to_inorder_string(input['eqn'])
     return s
 
-ops = { '^' : (lambda x,y : x**y),
-        '*' : (lambda x,y : x * y),
-        '/' : (lambda x,y : x / y),
-        '+' : (lambda x,y : x + y),
-        '-' : (lambda x,y : x - y)}
 def function_as_lambda(func):
     if func['type'] == 'operator':
         left = function_as_lambda(func['left'])
@@ -75,6 +88,8 @@ def build_random_function():
 def build_random_input():
     input = {}
     input['dx'] = 1 #random()
-    input['eqn'] = build_random_function()
+    #input['eqn'] = build_random_function()
+    # TODO -- remove temporarily disabled random functions.
+    input['eqn'] = { 'type' : 'constant', 'value' : '0' }
     return input
 
