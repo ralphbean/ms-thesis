@@ -1,6 +1,7 @@
 #!/usr/bin/python
 from random import random
 from math import sqrt, fabs, log, tanh
+import sys
 
 # The simulator module contains a few functions for simulating arbitrary
 #  *discrete* dynamical systems and approximating their lyapunov spectrums.
@@ -49,11 +50,11 @@ def iterate(system, x):
 #      system while approximating the lyapunov spectrum.
 def measure_lyapunov(
         system,
-        warmup_iterations=25,
-        measurement_iterations=50,
+        warmup_iterations=250,
+        measurement_iterations=500,
         trials=8):
 
-    epsilon = 1e-6
+    epsilon = 1e-12
     total = 0
     for i in range(trials):
         # Randomly generate a n-dimensional initial seed
@@ -67,17 +68,29 @@ def measure_lyapunov(
         y = [random() + x[k] for k in range(system['n'])]
 
         for j in range(measurement_iterations):
-            y = [y[k] - x[k] for k in range(system['n'])]  # Translate y from x
+            y = [y[k] - x[k] for k in range(system['n'])]# Translate y from x
             ymag = sqrt(sum([ele**2 for ele in y]))        # Get the size of y
             if ( ymag == 0 ):
                 ymag = ymag + epsilon
             y = [d0 * ele / ymag for ele in y]             # Scale y
-            y = [y[k] + x[k] for k in range(system['n'])]  # Translate y to x
+            y = [y[k] + x[k] for k in range(system['n'])]# Translate y to x
+            y[:2] = x[:2] # Reset the input and time variable
 
             # Okay -- actually iterate the two values.
             x = iterate(system, x)
             y = iterate(system, y)
-            d1 = sqrt(sum([(x[k]-y[k])**2 for k in range(system['n'])]))
+            # Measure distance (don't take time and input into account)
+            d1 = sqrt(sum([(x[k]-y[k])**2 for k in range(2,system['n'])]))
+
+            # TODO -- remove this sanity test
+            d_test = sqrt(sum([(x[k]-y[k])**2 for k in range(2)]))
+            if fabs(d_test) > epsilon:
+                print "|d_test| > epsilon"
+                print d_test
+                print epsilon
+                sys.exit(0)
+            # TODO -- end sanity test
+
             quotient = fabs( d1/d0 )
             if ( quotient == 0 ):
                 quotient = quotient + epsilon
