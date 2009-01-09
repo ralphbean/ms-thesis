@@ -1,5 +1,5 @@
 
-from random import random
+from random import random, randint
 from math import sqrt, tanh
 import inputs
 import linalg
@@ -49,5 +49,6 @@ def instantiate( constraints, input, num_copies=1 ):
 
 # n is the size of the neural net
 def build_random_constraints(n):
-    return [[random()*20 - 10 for j in range(n**2 + 1)] for i in range(n**2)]
-
+    return [[r_val() for j in range(n**2 + 1)] for i in range(n**2)]
+def r_val():
+    return randint(0,1)*(random()*20-10)

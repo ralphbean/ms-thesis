@@ -55,12 +55,9 @@ def mutate_input(input):
     # Let the inputs module handle this.  Its messy.
     return inputs.mutate(input)
 
-def fitness(o):
+def fitness(o, num_instances=15):
     if 'fitness' in o:
         return o['fitness']
-
-    num_instances = 15
-
     try:
         nets = constr.instantiate(o['constraints'], o['input'], num_instances)
     except Exception:  # Unsatisfiable set of constraints.
@@ -139,10 +136,9 @@ def selection(population):
     return population
 
 # Main method.
-def run():
-    ID = int(time.time())
+def run(ID):
     print "Running with ID:", ID
-    population = init_population(100,2)
+    population = init_population(100,10)
     generation = 0
     while ( True ):
         datastore.store(population, generation, ID)
@@ -150,5 +146,8 @@ def run():
         population = selection(population)
 
 if __name__ == '__main__':
-    run()
+    ID = int(time.time())
+    if len(sys.argv) > 1:
+        ID = sys.argv[1]
+    run(ID)
 

@@ -18,29 +18,32 @@ def load_fitnesses(ID):
     return fits
 
 
+def load_freevar_count(ID):
+    F = open("../dat/" + str(ID) + ".fre", "r")
+    lines = F.readlines()
+    lines = [line[:-1] for line in lines]
+    toks = [line.split(",") for line in lines]
+    frees = [[float(ele) for ele in tok] for tok in toks]
+    frees = frees[0]
+    return range(len(frees)), frees
 
+def fitness_over_time(trial_ID):
+    fits = load_fitnesses(trial_ID)
+    pylab.plot([j for j in range(len(fits))], fits, 'b-')
+    pylab.show()
+    pylab.cla()
 
+def free_vars_count(trial_ID):
+    possible, counts = load_freevar_count(trial_ID)
+    pylab.plot(possible, counts, 'b-')
+    pylab.show()
+    pylab.cla()
 
 trial_ID = sys.argv[1]
 while( True ):
     try:
-        fits = load_fitnesses(trial_ID)
-        #for i in range(len(fits)):
-            #pylab.plot([i for j in range(len(fits[i]))],
-            #           [float(val) for val in fits[i]],
-            #           'b.')
-        #for i in range(len(fits[0])):
-        #    pylab.plot([j for j in range(len(fits))],
-        #           [fits[j][i] for j in range(len(fits))],
-        #           'b-')
-        pylab.plot([j for j in range(len(fits))], fits, 'b-')
-        print "foo1"
-        pylab.show()
-        print "foo2"
-        pylab.cla()
-        print "foo3"
+       free_vars_count(trial_ID)
+       #fitness_over_time(trial_ID)
     except IOError:
         print "Waiting on", sys.argv[1], "to appear."
         sleep(10)
-
-
