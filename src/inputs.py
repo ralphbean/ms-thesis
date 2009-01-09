@@ -14,9 +14,42 @@ def mutate(input):
     input['eqn'] = _mutate(input['eqn'])
     return input
 
-def _mutate(root):
-    # TODO -- recursive mutation on the function tree
+# One of a few mutation operations:
+def _mut_replace_node(root):
+    del root
+    return build_random_function()
+
+# Another mutation operation:
+def _mut_by_type(root):
+    chance = random()
+    if root['type'] == 'operator':
+        # Change the operator
+        root['value'] = ops.keys()[randint(0,len(ops.keys())-1)]
+    elif root['type'] == 'parameter':
+        # We only have one type of parameter... so nothing to do here.
+        pass
+    elif root['type'] == 'constant':
+        root['value'] = str(float(root['value'])*(random()*2)+(random()*2-1))
+    else:
+        raise ValueError, "Undefined data type in _mutate."
     return root
+# Note:  -- need to list all the mutation operations here
+mut_fncs = [_mut_replace_node, _mut_by_type]
+
+# This function uses all the mutation operations listed above.
+def _mutate(root):
+    if 'left' in root and 'right' in root:
+        # Traverse children or mutate here?
+        if random() < 0.5:
+            lor = ['left', 'right']
+            i = randint(0,1)
+            root[lor[i]] = _mutate(root[lor[i]])
+            return root
+
+    # Otherwise, we are mutating at this node.
+    # Select from all the different types of mutations
+    i = randint(0, len(mut_fncs)-1)
+    return mut_fncs[i](root)
 
 # Takes a tree as a dictionary and prints its nodes inorder
 def tree_to_inorder_string(root):
@@ -88,8 +121,8 @@ def build_random_function():
 def build_random_input():
     input = {}
     input['dx'] = 1 #random()
-    #input['eqn'] = build_random_function()
+    input['eqn'] = build_random_function()
     # TODO -- remove temporarily disabled random functions.
-    input['eqn'] = { 'type' : 'constant', 'value' : '0' }
+    #input['eqn'] = { 'type' : 'constant', 'value' : '0' }
     return input
 

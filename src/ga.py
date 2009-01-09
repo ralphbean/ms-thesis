@@ -59,7 +59,7 @@ def fitness(o):
     if 'fitness' in o:
         return o['fitness']
 
-    num_instances = 2
+    num_instances = 15
 
     try:
         nets = constr.instantiate(o['constraints'], o['input'], num_instances)

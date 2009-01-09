@@ -25,18 +25,20 @@ trial_ID = sys.argv[1]
 while( True ):
     try:
         fits = load_fitnesses(trial_ID)
-        pylab.hold(True)
         #for i in range(len(fits)):
             #pylab.plot([i for j in range(len(fits[i]))],
             #           [float(val) for val in fits[i]],
             #           'b.')
-        for i in range(len(fits[0])):
-            pylab.plot([j for j in range(len(fits))],
-                   [fits[j][i] for j in range(len(fits))],
-                   'b-')
-        pylab.hold(False)
+        #for i in range(len(fits[0])):
+        #    pylab.plot([j for j in range(len(fits))],
+        #           [fits[j][i] for j in range(len(fits))],
+        #           'b-')
+        pylab.plot([j for j in range(len(fits))], fits, 'b-')
+        print "foo1"
         pylab.show()
+        print "foo2"
         pylab.cla()
+        print "foo3"
     except IOError:
         print "Waiting on", sys.argv[1], "to appear."
         sleep(10)
