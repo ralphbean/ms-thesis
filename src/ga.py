@@ -2,6 +2,8 @@
 
 import inputs, datastore, simulator
 import constraints as constr
+import constants
+from math import sqrt, log, fabs
 
 import sys, time
 from random import random, randint
@@ -13,12 +15,54 @@ from random import random, randint
 #    as well as a few samplings of their input f(x) )
 #  Use distance formula or some sort of metric I find
 #   online.
-def diversity(population):
-    pass
+def diversity(pop):
+    # Deal with constraints
+    # Specifically, calculate the sum of the distances of every organism from
+    #  every other organism.
+    c_tot, i_tot = 0,0
+    for org in pop:
+        for other in pop:
+            c_tot = c_tot + constraint_dist(org, other)/(float(len(pop))**2)
+            i_tot = i_tot + input_dist(org, other)/(float(len(pop))**2)
+    return c_tot, i_tot
 
+def constraint_dist(o1, o2):
+    c1, c2 = o1['constraints'], o2['constraints']
+    tot = 0
+    for r in xrange(len(c1)):
+        for c in xrange(len(c2)):
+            tot = tot + (c1[r][c] - c2[r][c])**2
+    return sqrt(tot)
+
+def input_dist(o1, o2):
+    i1, i2 = o1['input'], o2['input']
+    eqns1 = inputs.input_as_lambdas(i1)
+    eqns2 = inputs.input_as_lambdas(i2)
+    syst1 = { 'n' : 2, 'consts' : [], 'eqns' : eqns1 }
+    syst2 = { 'n' : 2, 'consts' : [], 'eqns' : eqns2 }
+    test_iterates = (constants.num_warmup_iterations +
+                     constants.num_measur_iterations )
+    x1, x2 = [0,0], [0,0]
+    traj1, traj2 = [], []
+    for i in xrange(test_iterates):
+        traj1.append(x1)
+        traj2.append(x2)
+        x1 = simulator.iterate(syst1, x1)
+        x2 = simulator.iterate(syst2, x2)
+    diff = [(fabs(traj1[i][1] - traj2[i][1]))/test_iterates 
+                  for i in xrange(len(traj1))]
+    dist = log(log(sqrt(sum(diff))+1)+1)
+    return dist
+
+def test_input_dist():
+    i1 = inputs.build_random_input()
+    i2 = inputs.build_random_input()
+    print "i1:", inputs.input_to_string(i1)
+    print "i2:", inputs.input_to_string(i2)
+    print "dist:", input_dist({'input':i1}, {'input':i2})
 
 def crossover(o1, o2):
-    mutation_rate = 0.02
+    mutation_rate = constants.mutation_rate
     o = {}
     o['constraints']=crossover_constraints(o1['constraints'],o2['constraints'])
     o['input']      =crossover_inputs(     o1['input'],      o2['input']      )
@@ -55,7 +99,8 @@ def mutate_input(input):
     # Let the inputs module handle this.  Its messy.
     return inputs.mutate(input)
 
-def fitness(o, num_instances=15):
+# TODO -- determine fitness variability with a coded test.
+def fitness(o, num_instances=constants.num_instances):
     if 'fitness' in o:
         return o['fitness']
     try:
@@ -73,6 +118,9 @@ def fitness(o, num_instances=15):
     ### Or not:
     return sum(lyaps)/num_instances
 
+    ### Or, just look for the best.
+    #return max(lyaps)
+
 # Initialize an organism
 #  n is the number of neurons in the systems to be represented.
 def init_organism(n):
@@ -86,22 +134,26 @@ def init_organism(n):
 # Initialize a population.
 #  N is the number of organisms in the population.
 #  n is the number of neurons in networks.
-def init_population(N=4, n=10):
+def init_population(N=constants.num_organisms_in_population, 
+                    n=constants.num_neurons):
     print "Initializing population.  N =", N, "n =", n
     assert(N >= 4)
     assert(n >= 2)
     pop = []
-    for i in range(N):
+    for i in xrange(N):
         print "\r%", 100.0*float(i)/N,
         sys.stdout.flush()
-        pop.append(init_organism(n))
+        o = init_organism(n)
+        while fitness(o) < -25:# -10000000:
+            o = init_organism(n)
+        pop.append(o)
     print "Done."
     return pop
 
 
 def selection(population):
     indices = []
-    for i in range(4):
+    for i in xrange(4):
         index = randint(0,len(population)-1)
         while index in indices:
             index = randint(0,len(population)-1)
@@ -125,11 +177,14 @@ def selection(population):
     child1 = crossover(winner1, winner2)
     child2 = crossover(winner2, winner1)
 
-    # Only replace losers if children are more fit
-    if ( fitness(child1) > fitness(loser1) ):
-        population[population.index(loser1)] = child1
-    if ( fitness(child2) > fitness(loser2) ):
-        population[population.index(loser2)] = child2
+    ## Only replace losers if children are more fit
+    #if ( fitness(child1) > fitness(loser1) ):
+    #    population[population.index(loser1)] = child1
+    #if ( fitness(child2) > fitness(loser2) ):
+    #    population[population.index(loser2)] = child2
+    ## Or .. just replace them anyways:
+    population[population.index(loser1)] = child1
+    population[population.index(loser2)] = child2
 
     population.sort(lambda x,y : cmp(fitness(x), fitness(y)))
 
@@ -138,16 +193,19 @@ def selection(population):
 # Main method.
 def run(ID):
     print "Running with ID:", ID
-    population = init_population(100,10)
+    population = init_population()
+
     generation = 0
     while ( True ):
         datastore.store(population, generation, ID)
         generation = generation + 1
         population = selection(population)
 
+
 if __name__ == '__main__':
     ID = int(time.time())
     if len(sys.argv) > 1:
         ID = sys.argv[1]
     run(ID)
+    #test_input_dist()
 

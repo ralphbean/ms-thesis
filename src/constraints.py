@@ -51,4 +51,4 @@ def instantiate( constraints, input, num_copies=1 ):
 def build_random_constraints(n):
     return [[r_val() for j in range(n**2 + 1)] for i in range(n**2)]
 def r_val():
-    return randint(0,1)*(random()*20-10)
+    return randint(0,5)*random()

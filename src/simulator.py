@@ -1,6 +1,7 @@
 #!/usr/bin/python
 from random import random
 from math import sqrt, fabs, log, tanh
+import constants
 import sys
 
 # The simulator module contains a few functions for simulating arbitrary
@@ -50,9 +51,9 @@ def iterate(system, x):
 #      system while approximating the lyapunov spectrum.
 def measure_lyapunov(
         system,
-        warmup_iterations=250,
-        measurement_iterations=500,
-        trials=8):
+        warmup_iterations=constants.num_warmup_iterations,
+        measurement_iterations=constants.num_measur_iterations,
+        trials=constants.num_trials_per_instance):
 
     epsilon = 1e-12
     total = 0
