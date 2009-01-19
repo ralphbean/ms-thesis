@@ -1,7 +1,6 @@
 #!/usr/bin/python
 
 import inputs, datastore, simulator
-import constraints as constr
 import constants
 from math import sqrt, log, fabs
 
@@ -16,18 +15,17 @@ from random import random, randint
 #  Use distance formula or some sort of metric I find
 #   online.
 def diversity(pop):
-    # Deal with constraints
     # Specifically, calculate the sum of the distances of every organism from
     #  every other organism.
     c_tot, i_tot = 0,0
     for org in pop:
         for other in pop:
-            c_tot = c_tot + constraint_dist(org, other)/(float(len(pop))**2)
+            c_tot = c_tot + weights_dist(org, other)/(float(len(pop))**2)
             i_tot = i_tot + input_dist(org, other)/(float(len(pop))**2)
     return c_tot, i_tot
 
-def constraint_dist(o1, o2):
-    c1, c2 = o1['constraints'], o2['constraints']
+def weights_dist(o1, o2):
+    c1, c2 = o1['weights'], o2['weights']
     tot = 0
     for r in xrange(len(c1)):
         for c in xrange(len(c2)):
@@ -64,14 +62,14 @@ def test_input_dist():
 def crossover(o1, o2):
     mutation_rate = constants.mutation_rate
     o = {}
-    o['constraints']=crossover_constraints(o1['constraints'],o2['constraints'])
-    o['input']      =crossover_inputs(     o1['input'],      o2['input']      )
+    o['weights']    =crossover_weights(    o1['weights'],  o2['weights'])
+    o['input']      =crossover_inputs(     o1['input'],    o2['input']  )
     if random() < mutation_rate:
         o = mutate(o)
     o['fitness']    =fitness(o)
     return o
 
-def crossover_constraints(c1, c2):
+def crossover_weights(c1, c2):
     r,c = randint(0,len(c1)-1), randint(0,len(c1[0])-1)
     child = [row for row in c1]
     child[r:] = [row for row in c2[r:]]
@@ -125,7 +123,8 @@ def fitness(o, num_instances=constants.num_instances):
 #  n is the number of neurons in the systems to be represented.
 def init_organism(n):
     # Organisms are python dictionaries
-    o = {   'constraints' : constr.build_random_constraints(n),
+    o = {   'weights'     : [[randint(-2,2)*random() for j in range(n)] 
+                                                     for i in range(n)],
             'input'       : inputs.build_random_input() }
     # Cache the fitness
     o['fitness'] = fitness(o)
