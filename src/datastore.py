@@ -18,6 +18,7 @@ def store_as_pickles(population, generation, trial_ID):
     F.close()
 
 def store_freevar_count(population, generation, trial_ID):
+    return
     frees = [len(linalg.determineFreeVariables(o['constraints'])) 
             for o in population]
     counts = {}
@@ -32,6 +33,8 @@ def store_freevar_count(population, generation, trial_ID):
              for i in range(len(o['constraints']))]) + '\n' ])
     F.close()
 def store_diversity(population, generation, trial_ID):
+    return
+    print "Storing diversity."
     c_div, i_div = ga.diversity(population)
     print "constraint diversity:", c_div
     print "input diversity:     ", i_div
@@ -50,7 +53,7 @@ def store_fitnesses(population, generation, trial_ID):
 def print_out_heroes(population, generation, trial_ID):
     print
     print "Trial: ", trial_ID, " Generation: ", generation
-    print "Diversity: ", ga.diversity(population)
+    #print "Diversity: ", ga.diversity(population)
     print "Hero: "
     for o in [population[-1]]:
         print "Organism", population.index(o)

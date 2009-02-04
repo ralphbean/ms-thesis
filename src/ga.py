@@ -5,6 +5,7 @@ import constants
 from math import sqrt, log, fabs
 
 import sys, time
+import network
 from random import random, randint
 
 # A metric of the diversity of the population.
@@ -83,15 +84,15 @@ def crossover_inputs(i1, i2):
 
 def mutate(o):
     if random() < 0.5:
-        o['constraints'] = mutate_constraints(o['constraints'])
+        o['weights'] = mutate_weights(o['weights'])
     else:
         o['input'] = mutate_input(o['input'])
     return o
 
-def mutate_constraints(constraints):
-    r,c = randint(0,len(constraints)-1), randint(0,len(constraints[0])-1)
-    constraints[r][c] = constraints[r][c] + ((random() * 4) - 2)
-    return constraints
+def mutate_weights(weights):
+    r,c = randint(0, len(weights)-1), randint(0, len(weights[0])-1)
+    weights[r][c] = weights[r][c]*random()*2 + (random()*2-1)
+    return weights
 
 def mutate_input(input):
     # Let the inputs module handle this.  Its messy.
@@ -101,30 +102,14 @@ def mutate_input(input):
 def fitness(o, num_instances=constants.num_instances):
     if 'fitness' in o:
         return o['fitness']
-    try:
-        nets = constr.instantiate(o['constraints'], o['input'], num_instances)
-    except Exception:  # Unsatisfiable set of constraints.
-        return -10000000
-    lyaps = [simulator.measure_lyapunov(net) for net in nets]
-
-    ### TODO -- maybe consider this?
-    ### Weighted sum of lyaps
-    #lyaps.sort()
-    #weighted_lyaps = [lyaps[i]/(num_instances-i) for i in range(num_instances)]
-    #return sum(weighted_lyaps)/num_instances
-
-    ### Or not:
-    return sum(lyaps)/num_instances
-
-    ### Or, just look for the best.
-    #return max(lyaps)
+    net = network.instantiate(o['weights'], o['input'])
+    return simulator.measure_lyapunov(net)
 
 # Initialize an organism
 #  n is the number of neurons in the systems to be represented.
 def init_organism(n):
     # Organisms are python dictionaries
-    o = {   'weights'     : [[randint(-2,2)*random() for j in range(n)] 
-                                                     for i in range(n)],
+    o = {   'weights'     : network.build_random_weights(n),
             'input'       : inputs.build_random_input() }
     # Cache the fitness
     o['fitness'] = fitness(o)
@@ -135,6 +120,8 @@ def init_organism(n):
 #  n is the number of neurons in networks.
 def init_population(N=constants.num_organisms_in_population, 
                     n=constants.num_neurons):
+    n = constants.num_neurons
+    N = constants.num_organisms_in_population
     print "Initializing population.  N =", N, "n =", n
     assert(N >= 4)
     assert(n >= 2)
@@ -143,7 +130,7 @@ def init_population(N=constants.num_organisms_in_population,
         print "\r%", 100.0*float(i)/N,
         sys.stdout.flush()
         o = init_organism(n)
-        while fitness(o) < -25:# -10000000:
+        while fitness(o) < -10000000:
             o = init_organism(n)
         pop.append(o)
     print "Done."
@@ -191,8 +178,13 @@ def selection(population):
 
 # Main method.
 def run(ID):
-    print "Running with ID:", ID
-    population = init_population()
+    print "Running special test with ID:", ID
+    for n in range(2, 20):
+        constants.num_neurons = n
+        population = init_population()
+        datastore.store(population, 0, ID)
+    print "Dieing early."
+    return
 
     generation = 0
     while ( True ):
