@@ -1,0 +1,146 @@
+\documentclass{elsart1p}
+\usepackage{amsmath, amssymb, graphicx}
+\begin{document}
+
+Here we begin the work of deriving an expression of contraints on the
+parameters of a spiking neural network in terms of desired Lyapunov Exponents.
+
+For book keeping, important equations and theorems
+from the previous survey chapter will here be numbered.
+
+Recall that the Lyapunov Exponenets are defined as:
+\begin{eqnarray}
+L_{k} = e^{h_{k}} = \lim \limits_{n \to \infty} (r_{k}^{n})^{\frac{1}{n}}
+\end{eqnarray}
+% TODO check the following
+and can be alternatively expressed as:
+\begin{eqnarray}
+L_{k} = \sqrt{\lambda_{k}}
+\end{eqnarray}
+where $\lambda_{k}$ is the $k$th eigenvalue of the matrix $J_{m}J_{m}^{T}$.
+
+%TODO matrix numbering latex
+$J$ is the jacobian of $f$ given by \textit{(TODO, matrix numbering in \LaTeX)}:
+\[ J = \left( \begin{array}{cccc}
+\frac{\partial f_{1}}{\partial x_{1}} &.
+\frac{\partial f_{1}}{\partial x_{2}} &.
+\cdots &
+\frac{\partial f_{1}}{\partial x_{n}} \\
+\frac{\partial f_{2}}{\partial x_{1}} &.
+\frac{\partial f_{2}}{\partial x_{2}} &.
+ &
+\frac{\partial f_{2}}{\partial x_{n}} \\
+\vdots & & \ddots & \vdots \\
+\frac{\partial f_{n}}{\partial x_{1}} &.
+\frac{\partial f_{n}}{\partial x_{2}} &.
+\cdots &
+\frac{\partial f_{n}}{\partial x_{n}} \end{array} \right)\].
+
+$J_{m}$ is the jacobian of the $m$th iterate of $f$, given by:
+
+\[ J_{m} = \left( \begin{array}{cccc}
+\frac{\partial (f_{1}^{m})}{\partial x_{1}} &.
+\frac{\partial (f_{1}^{m})}{\partial x_{2}} &.
+\cdots &
+\frac{\partial (f_{1}^{m})}{\partial x_{n}} \\
+\frac{\partial (f_{2}^{m})}{\partial x_{1}} &.
+\frac{\partial (f_{2}^{m})}{\partial x_{2}} &.
+ &
+\frac{\partial (f_{2}^{m})}{\partial x_{n}} \\
+\vdots & & \ddots & \vdots \\
+\frac{\partial (f_{n}^{m})}{\partial x_{1}} &.
+\frac{\partial (f_{n}^{m})}{\partial x_{2}} &.
+\cdots &
+\frac{\partial (f_{n}^{m})}{\partial x_{n}} \end{array} \right)\].
+
+where $f_{i}^{m}$ does not denote the $m$th power of $f$ but the $m$th 
+composition of $f$.
+
+Recall that the derivative of functions under composition is given
+by the chain rule from calculus.
+\begin{eqnarray}
+(f^{m}(x))^{(\prime)} = f^{(\prime)}(f^{m-1}(x)) f^{(\prime)}(f^{m-2}(x)) \cdots f^{(\prime)}(f^{2}(x))  f^{(\prime)}(x) 
+\end{eqnarray}
+
+\textbf{Remark:} $J_{m}J_{m}^{T}$ is necessarily symmetric and therefore orthogonally
+diagonalizable by the Spectral Theorem from linear algebra.  Consequently,
+there exists a matrix $Q$ whose columns are the orthonormal eigenvectors of
+$J_{m}J_{m}^{T}$ and a matrix $D$ whose diagonal entries are the eigenvalues
+of $J_{m}J_{m}^{T}$ such that
+\begin{eqnarray}
+Q^{T}(J_{m}J_{m}^{T})Q = D
+\end{eqnarray}
+
+\subsection{Example:  Lyapunov Exponents of the Quadratic Maps}
+The quadratic map is a family of one-dimensional functions of the form 
+\begin{eqnarray}
+f_{\mu}(x) = \mu x (1-x)
+\end{eqnarray}
+ where $\mu$ is a real-valued parameter.
+$f_{\mu}(x)$ is known to be chaotic on the interval $[0,1]$ for $\mu=4$ and
+exhibits the period-doubling route to chaos from $\mu=2+\sqrt{5}$ to $\mu=4$.
+
+\textbf{TODO} cobweb diagram of the logistic map for clarity
+
+\textbf{TODO} bifurcation diagram of the logistic map for clarity
+
+Discovering an expression for the lyapunov exponenets in terms of the 
+parameter
+will be relatively simple since both the phase space and the parameter space
+are each one-dimensional.  We have only one possible lyapunov number, (there
+are as many as there are dimensions of the phase space) so our Jacobian
+will be only a $1 \times 1$ matrix.  The first derivative $f_{\mu}^{(\prime)}$ is given by:
+\begin{eqnarray}
+f_{\mu}^{(\prime)} = \mu - \mu x
+\end{eqnarray}
+
+\textbf{TODO} retool the below using the chain rule from calculus.
+
+\begin{eqnarray*}
+J_{1} &=& \frac{ \partial }{\partial x} (\mu x (1 - x)) \\
+      &=& \mu - 2\mu x \\
+J_{2} &=& \frac{ \partial }{\partial x} (\mu (\mu x (1-x)) (1 - (\mu x (1-x)))) \\
+      &=& \mu - 2\mu x \\
+J_{3} &=& \frac{ \partial }{\partial x} (\mu (\mu (\mu x (1-x)) (1-(\mu x (1-x)))) (1 - (\mu (\mu x (1-x)) (1-(\mu x (1-x))))) \\
+      &=& \mu - 2\mu x \\
+\end{eqnarray*}
+
+
+
+See \ref{eqn:foo1}
+
+\begin{def}
+
+foofoo
+
+\label{def:lyap1}
+\end{def}
+
+See \ref{def:lyap1}
+
+\begin{thm}
+The Lyapunov Exponents are given by the square root of the eigenvalues of $JJ^{T}$.
+\label{thm:lyap}
+\end{thm}
+
+See \ref{thm:lyap}
+
+\begin{thm}
+{foo0u}[foo1]
+foo2
+\label{thm:ortho}
+\end{thm}
+
+See \ref{thm:ortho}
+
+\begin{thm}
+{foo0u}[foo1]
+foo2
+\label{thm:spectral}
+\end{thm}
+
+See \ref{thm:spectral}
+
+
+
+\end{document}

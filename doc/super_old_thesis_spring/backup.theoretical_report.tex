@@ -1,0 +1,572 @@
+\documentclass{elsart}
+
+\usepackage{amssymb}
+\usepackage{multirow}
+\usepackage{graphicx}
+
+\begin{document}
+
+\begin{frontmatter}
+
+\title{Survey of Dynamical Systems and Reservoir Computing}
+
+\author{Ralph Bean}
+
+\end{frontmatter}
+
+\section{Introduction}
+
+\textbf{Brief recap of LSMs and Neural Networks}
+
+\textbf{TODO - this should be the last sentence of the introduction.}
+
+For my thesis, I intend to analytically derive some constraints on the parameters of a recurrent network of spiking neurons such that for the temporal patterns of interest, the corresponding orbits have a maximal lyapunov exponent $h_{k}$ such that $h_{k} - \epsilon \leq 0 < h_{k}$
+
+
+\section{Dynamical Systems}
+Dynamical systems theory is the branch of mathematics that is 
+concerned with systems of change equations and how the family of
+solutions to these equations behave over time.
+In some cases, i.e. for linear
+autonomous systems, explicit solutions can be found in terms of an
+independant time variable $t$ which guarantees knowledge of the state at
+any time along the evolution of the solution.  For \textit{most} equations, and
+in particular the ones we are interested in here, this cannot be done.
+The situation is not without hope, however, because the tools developed 
+in the study of linear autonomous systems can be used in the nonlinear 
+case with some modification.
+
+
+\subsection{Linear techniques}
+A linear equation on one variable is an equation of the form
+$f : \mathbb{R} \rightarrow \mathbb{R}$
+$$f(x) = ax$$ where $a$ is a parameter.
+The equations is called
+\textit{linear} because there are no squared or higher terms on the variable
+$x$.  Every value of $a$ describes a line which passes through the origin. 
+
+Linear equations of higher dimension are of the form 
+$f : \mathbb{R}^{n} \rightarrow \mathbb{R}^{n}$
+$$f(\vec{x}) = A \cdot \vec{x}$$
+Where $\vec{x} \in \mathbb{R}^{n}, A \in \mathbb{M}_{n,n}$.  Each 
+component of $f(\vec{x})$ can be expressed as a linear combination of the 
+rows of $A$ and the terms of $\vec{x}$.
+
+The relationship of $f(\vec{x})$ to the change rule determines which of two
+types a system is.  A \textit{continuous} dynamical system is given by
+a system of differential equations.
+$$\vec{x}^{\prime} = f(\vec{x})$$
+\textit{Discrete} dynamical systems are given by a map
+$$\vec{x}_{n+1} = f(\vec{x}_{n})$$
+
+We are concerned with both but will restrict ourselves to the continuous case
+for now.
+
+If the system at hand is linear, there are a number of well-developed tools
+from linear algebra that can help us understand the behavior over time.
+Setting $\vec{x}^{\prime} = \vec{0}$, we can solve for the roots of 
+$f(\vec{x})$ which correspond to equilibria of the system.  While 
+equilibria solutions are fixed, the qualitative behavior of solutions passing
+near the equilibria can be determined by eigenvalue analysis.
+The product of a matrix $A$ with any vector can be expressed as a linear combination of the eigenvalues and eigenvectors of that matrix.  Since our 
+derivative $\vec{x}^{\prime}$ is everywhere defined by such a matrix product,
+we can characterize the behavior of solutions everywhere.
+
+\begin{figure}[htp]
+\centering
+\includegraphics[width=400pt]{figures/eigenvalues.pdf}
+\caption{Phase portraits of autonomous, linear, planar systems with 
+    sundry eigenvalues.
+The top-left panel depicts a \textit{sink}, a planar system characterized by two distinct, negative eigenvalues.  Top-right:  a \textit{source} due to two distinct, positive eigenvalues.  Bottom left:  Both real, but one positive and one negative eigenvalue making this a \textit{saddle} equilibrium.  The bottom right displays a complex-conjugate pair of eigenvalues with positive real component making this a \textit{spiral source}.}
+\label{fig:eigenvalues}
+\end{figure}
+
+Consider the effect on $\vec{x}^{\prime} = A\cdot\vec{x}$ for $A$ with eigenvalues with only positive real part.  For any $\vec{x}$, the change in $\vec{x}$ with respect to $t$ will be positive everywhere
+and $\vec{x}$ will tend to $\infty$.  For $A$ with only negative real part eigenvalues, the derivative of $\vec{x}$ will be negative everywhere for every component and $\vec{x}$ will necessarily tend to the origin.  $A$ with complex conjugate eigenvalues exhibit subclasses of spiral behavior dependent on the sign of both the real and imaginary parts.
+
+Understandably, equilibria with positive eigenvalues are called \textit{sources} or \textit{unstable} nodes since solutions tend away except for the equilibria point itself.  Those with negative are called \textit{sinks} or \textit{stable} nodes.  In the 2D planar case, equilibria with mixed (one positive, one negative) are called \textit{saddle} due to the shape of their vector fields.  But for
+the purpose of generalizing these ideas to the unimaginable higher dimensions,
+it is worth pointing out that a saddle is perhaps more accurately described
+as an equilibrium with one stable, one-dimensional subspace and another 
+unstable, one-dimensional subspace.  Beyond eigenvalue analysis, other
+linear algebra techinques apply such as orthogonal decomposition and,
+LU-factorization.
+
+\subsubsection{Relevant Spaces and Bifurcation}
+Substantively identical to vector spaces in the above discussion, the
+state space or phase space (the terms will be used interchangeably), 
+denoted $\mathbb{S}$, of a dynamical system is a space in which 
+every point is a unique \textit{state}, $\vec{s}$, of the system.  For every
+$\vec{s} \in \mathbb{S}$, an either discrete or continuous change rule describes
+uniquely the evolution of that point both forwards and backwards in time.
+
+Strictly speaking, a dynamical system is defined completely by its 
+change rule and its state space $(f, \mathbb{S})$ \cite{Hirsch}.  
+
+There are a number of different ways of conceptualizing this all with varying
+degrees of usefulness.  For instance, for a set $X$ and a \textit{topology} 
+$T$ composed of
+open subsets of $X$, the pair $(X,T)$ defines a \textit{topological space}.
+
+For a system, one typical task of dynamical analysis is to determine its
+$\alpha$ and $\omega$-sets (to be discussed more later).  Discussion of the
+system can then proceed not in terms of its change rule but in terms of the topological properties of its 
+$\alpha$ and $\omega$-sets as open subsets of its set of possible states 
+\cite{basener}.
+
+
+Another, and perhaps more familiar, conceptualization is the 
+characterization of
+a system's \textit{tangent space}.  For a system on $\mathbb{R^{n}}$, remember
+that at every $n$-dimensional state vector there exists another $n$-dimensional
+vector under $f$ that describes the change at that location.  Then,
+Together, these change vectors compose the tangent space of the phase space.
+The easiest case to imagine is for a one-dimensional dynamical system, then
+the orthogonal composition of the $x^{\prime}$ tangent space and the
+$x$ phase space completely describe the system.  Not much has changed from
+our original definition, except for the introduction of a new 
+geometric lens with which to consider a system's dynamics \cite{arrowsmith}.
+
+Consider the effect that a given change rule has on the phase space.  Every
+point is mapped uniquely to a (not necessarily periodic) orbit.  How does this
+structuring of the phase space via the change rule itself change for change
+rules that are 'close' to one another?  Often times, a particular change
+rule will be parameterized which gives us a vehicle to explore the question.
+
+The \textit{parameter space}, $\mathbb{P}$ of a dynamical system is a space in
+which every point corresponds to a unique combination of parameters for a
+particular system and therefore to a unique structuring of the phase space.
+
+For example, take the nonlinear, one-dimensional system 
+$$x^{\prime} = f_{h}(x) = x(1-x)-h.$$  Here, $h$
+is the only parameter so $\mathbb{P} \subset \mathbb{R}$.  Solving for the
+equilibria $x^{\prime} = 0$ in terms of $h$ gives $$x^{*}=\frac{1}{2} \pm \sqrt{\frac{1}{4} - h}.$$
+What are the equilibria $x^{*}$ for different $h$?  At $h=0$ there are two equilibria $x^{*}=\{0,1\}$.  At $h=\frac{1}{4}$ there is only one equilibria at $x^{*}=\frac{1}{2}$.  For 
+$h > \frac{1}{4}$ the term inside the square root is negative, and so we have complex conjugate roots for the system.  The phase portraits are not depicted, but if we were to animate the flows of $f_{h}$ while slowly increasing $h$, we would see the two equilibria move towards one another, merge at $h=\frac{1}{4}$ into a stable fixed point and subsequently vanish altogether.
+
+
+\begin{figure}[htp]
+\centering
+\includegraphics[width=400pt]{figures/bifurcation1.pdf}
+\caption{The one dimensional system $x\prime = f_{h}(x) = x(1-x)-h$.
+Top left $h=0$.  Top right $h=\frac{1}{8}$.
+Bottom left, bifurcation at $h=\frac{1}{4}$.
+Bottom right $h=\frac{3}{8}$.} 
+\label{fig:hopf}
+\end{figure}
+
+
+$h=\frac{1}{4}$ is called a \textit{bifurcation point}, a shape (in this case, a point) in parameter space, the points on either side of which correspond to qualitatively different dynamics.
+
+There are a number of studied and named bifurcations that occur in families of systems, namely the heteroclinic, homoclinic, period doubling, pitchfork, saddle-node, tangent, and Hopf bifurcations.  Period doubling bifurcations, one signature of chaos in discrete systems as well as the continuous-system Hopf bifurcation, exhibited by the FitzHugh-Nagumo neural model, are of interest to us but 
+first require an introduction to techniques for nonlinear dynamical systems.
+
+%\subsubsection{it is worth mentioning: poincare map}
+%\textbf{TODO}
+%I need to write here about Poincar\'{e} maps for discretizing 
+%continuous neural equations.  Its a simple idea with lots of theorems as
+%a result 
+
+\subsection{ Local Nonlinear Techniques }
+The introduction of non-linearity creates problems.  No longer can we
+generalize behavior about solutions away from equilibria by analyzing the
+eigenvalues of the equilibria alone.  Furthermore, we cannot even
+represent $f(\vec{x})$ as a matrix product; directly solving for
+the eigenvalues not even an option.
+
+The first technique to apply (and perhaps the least interesting) is to
+linearize the nonlinear system about a particular equilibrium and analyze
+the properties of that system.  This can tell us at least something about
+the system, but any results obtained apply only locally to an 
+arbitrarilly small neighborhood about that point.
+The method of linearization on non-linear systems is justified by 
+the observation
+that any non-linear terms, when within the unit-sphere, become less and
+less influential the closer they are evaluated to the origin and thus, the
+linearization becomes more and more valid.
+
+The Jacobian matrix gives the linearization of a system $f_{\vec{x}}$.
+
+\[ J_{f} = \left( \begin{array}{cccc}
+
+\frac{\partial f_{1}}{\partial x_{1}} & 
+\frac{\partial f_{1}}{\partial x_{2}} & 
+\cdots &
+\frac{\partial f_{1}}{\partial x_{n}} \\
+
+\frac{\partial f_{2}}{\partial x_{1}} & 
+\frac{\partial f_{2}}{\partial x_{2}} & 
+ &
+\frac{\partial f_{2}}{\partial x_{n}} \\
+
+\vdots & & \ddots & \vdots \\
+
+
+\frac{\partial f_{n}}{\partial x_{1}} & 
+\frac{\partial f_{n}}{\partial x_{2}} & 
+\cdots &
+\frac{\partial f_{n}}{\partial x_{n}} \end{array} \right)\] 
+
+Solving for the eigenvalues of the Jacobian evaluated at the equilibria gives
+information about their \textit{local} stability.  This technique,
+however, gives us valid information only if the linearization is nonhyperbolic,
+    which is to say, it has no zero-real-part eigenvalues.  When the
+    linearization is hyperbolic, global nonlinearities ultimately determine
+    the fate of orbits as arbitrarily close to the hyperbolic equilibria as you
+    would like.
+
+The Jacobian will come into play again later when calculating the Lyapunov
+exponents of discrete systems.
+
+\subsubsection{ Hopf Bifurcations }
+The famous Hopf Bifurcation is an example of the emergence of a globally
+stable limit cycle (figure \ref{fig:hopf}): an attractor which is periodic and not one of the
+roots of $f(\vec{x})$ as all attractors have been so far.  This occurs when
+there is a locally stable fixed point equilibria in the linearization and 
+non-linear stability as well towards that fixed point as well.  
+Parameterization of 
+the system such that the linearization has zero real part and is 
+therefore hyperbolic results in a 
+competition between local and global, linear and nonlinear tendencies which 
+stabilize at a not-necessarilly circular but nonetheless closed limit cycle 
+about the fixed point.
+
+\begin{figure}[htp]
+\centering
+\includegraphics[width=200pt]{figures/hopf.pdf}
+\caption{A system having undergone a Hopf bifurcation with an unstable node
+and a stable periodic orbit.} 
+\label{fig:hopf}
+\end{figure}
+
+
+The FitzHugh-Nagumo model of the neuron was one of the first proposed
+alongside a discussion of dynamical systems theory.  Supercritical orbits in those systems model 
+subthreshold oscillations and tonic spiking of neurons and the presence of
+post Hopf bifurcation orbits correspond to tonic spiking patterns \cite{fitzhugh, izhikevich_book}.
+
+\begin{figure}[htp]
+\centering
+\includegraphics[width=400pt]{figures/fitzhugh_bifurcation1.pdf}
+\caption{The FitzHugh-Nagumo model of the neuron 
+undergoing a Hopf Bifurcation that
+corresponds with a cell depolarization.  The horizontal v-axis models the
+internal voltage and the vertical u-axis models the recovery variable.
+The top left panel depicts the phase
+portrait of the model when a constant hyperpolarizing (inhibitory) stimulus is applied.  As the inhibitory stimulus modeled by the parameter $I$ decreases
+one can see the amplification of subthreshold oscillations in the top right
+panel.  $I$ is lowered further in the bottom left panel pushing the system past
+a bifurcation point in both that and the bottom right panel.}
+\label{fig:fhn1}
+\end{figure}
+
+\subsection{ Global Nonlinear Techniques }
+The Hopf Bifurcation above is a global phenomena that can be identified by
+local analysis but there exist global techniques that do not depend on
+linearization at equilibria and that can aid in determining systems' behavior.
+
+For a system of the form:
+\[\begin{array}{ccc}
+x_{1}^{\prime} & = & f_{1}(x_{1}, \cdots, x_{n}) \\
+& \vdots & \\
+x_{n}^{\prime} & = & f_{n}(x_{1}, \cdots, x_{n}), \end{array} \] 
+
+The $x_{j}$-nullcline is the curve that traces where $x_{j}^{\prime} = 0$.  Each of the $x_{j}$-nullclines typically carve $\mathbb{R}^{n}$ up into halves
+and allow us to then decompose the phase space into a collection of sets.
+Inside each of these sets, we know that the direction field is always pointing
+in one particular quadrant and can then develop constructions about the behavior
+of orbits.  You can, for instance rule out travel from one set to another, 
+pruning a graph of possible set transitions.
+
+
+Other global nonlinear techniques include identifying the system as
+being of a particular form about which there are particularly helpful theorems.
+
+Gradient systems are of the form
+$$\vec{x}^{\prime} = -\nabla V(\vec{x})$$
+For some $V : \mathbb{R}^{n} \rightarrow \mathbb{R}$ where $\nabla V = \left( \frac{\partial V}{\partial x_{1}},\cdots,\frac{\partial V}{\partial x_{n}}  \right)$.  
+
+Planar Hamiltonian systems are of the form
+$$x^{\prime} = \frac{\partial H}{\partial y}(x,y)$$
+$$y^{\prime} = -\frac{\partial H}{\partial x}(x,y)$$
+for some function $H : \mathbb{R}^{n} \rightarrow \mathbb{R}$.  Hamiltonian systems enjoy the property that the derivative of the hamiltonian function is 
+zero everywhere, so every level curve of the surface defined by $H(x,y)$ is
+a solution of the system.  The equation can be solved explicitly without much
+if any work.  This becomes more complicated in cases with dimension greater
+than 2 but is still relevant.
+
+\subsection{Chaos in Nonlinear Systems}
+A function $f : I \rightarrow I$ where $I \subset \mathbb{S}$ is said to be chaotic iff:\cite{hirsch}
+\begin{enumerate}
+\item Periodic points of $f$ are dense in $I$;
+\item $f$ is transitive on $I$;  that is, given any two subintervals $U_{1}$
+and $U_{2}$ in $I$, there is a point $x_{0} \in U_{1}$ and an $n > 0$ such 
+that $f^{n}(x_{0}) \in U_{2}$;
+\item $f$ has sensitive dependence in $i$; that is, there is a
+\textit{sensitivity constant} $\beta$ such that, for any $x_{0} \in I$ and
+any open interval $U$ about $x_{0}$, there is some seed $y_{0} \in U$ and 
+$n > 0$ such that
+$$|f^{n}(x_{0}) - f^{n}(y_{0})| > \beta$$
+\end{enumerate}
+
+The set of periodic points of $f$ being dense in $I$ amounts to saying that
+there are many such periodic points.  More formally, there exist points in $I$
+that are surrounded with arbitrary closeness by periodic points of $f$.
+
+For the reader unfamiliar with the notion of set density, consider
+this example of a set of numbers that is dense in another set of numbers.
+The set of rational numbers $\mathbb{Q}$ is dense in the set of real numbers 
+$\mathbb{R}$.  Given any $x \in \mathbb{R}$, one can find (more 
+appropriately, construct) a number $y \in \mathbb{Q}$ that is 
+\textit{arbitrarilly} close to $x$.  For instance, say I have chosen an $x$
+and you pick such a $y$ as close as you can.
+For arguments sake, let's assume $y < x$.  Furthermore, we know that
+the set of rational number $\mathbb{Q}$ is defined as the set of numbers
+that can be constructed as fractions of integers.  Therefore, your 
+$y = \frac{z_{1}}{z_{2}}$ for some $z_{1}, z_{2} \in \mathbb{Z}$.  No matter
+your choice, since there are an infinite number of $z_{i}$ in $\mathbb{Z}$,
+I can pick $w = \frac{z_{3}}{z_{4}}$ such that $y < w < x$.  Hopefully
+this illustration of what it means for a set to be dense in another set
+illuminates what it means for a system's set of periodic points of $f$ to be
+dense in a subregion of its state space.
+
+The second condition, the transitivity of $f$, amounts to a \textit{mixing} 
+requirement.  Points from $U_{1}$ at some time end up in $U_{2}$ and points 
+from $U_{2}$ at some time end up in $U_{1}$.  This follows from the above 
+property of the density of periodic points of $f$.
+
+The third property, sensitive dependence on initial conditions, is the most
+popularly understood aspect of chaos and is alternatively known as
+'the butterfly effect'.  In our subsequent investigation of neural systems,
+it is this condition of chaos on which we will rely most heavily.  However,
+computing an constant upper-bound for $\beta$ is a non-trivial task.
+
+A reasonable but somewhat disputed alternative to this condition 
+involves characterizing the \textit{rate} of
+separation of orbits by calculating \textit{Lyapunov exponents}.
+Define the $k$th Lyapunov exponent, $h_{k}$, as
+$$h_{k} = \log \left( \lim \limits_{n \to \infty} (r_{k}^{n})^{\frac{1}{n}}\right)$$
+Although the value of $h_{k}$ is that in which we are most interested (is the rate of separation exponential or not?), introducing the $k$th \textit{Lyapunov number} $L_{k}$ simplifies the equation and is given by
+$$L_{k} = e^{h_{k}} = \lim \limits_{n \to \infty} (r_{k}^{n})^{\frac{1}{n}}$$
+For a trajectory through the state space, consider the effect had on the points on a hypersphere of arbitrarilly small radius centered on the initial seed of 
+the orbit.  Over the evolution of the system, this hypersphere evolves into
+a hyperellipsoid.
+The value of $r_{k}^{n}$ are the $k$th longest orthogonal axis of the hyperellipsoid at the $n$th iterative application of $f$ \cite{alligood, lyapunov, verstraeten}.
+
+Numerically approximating the Lyapunov exponents means iterating the system
+into its future and measuring these axes.  This is just as computationally
+intensive as calculating the original sensitivity constant given in \cite{hirsch}.  Furthermore, approximation in the presence of chaos
+is problematic with regard to numeric precision.
+
+However, a solution is shown in \cite{alligood}.
+The radii of the hyperellipsoid, $r_{k}^{n}$, are given by the
+square root of the eigenvalues of $J_{n}J_{n}^{T}$ where $J_{n}$ is the 
+Jacobian of the $n$th iteration.  This can be solved explicitly and
+while non-trivial, is much less computationally expensive.
+
+This method is the cornerstone theorem on which results will be built in later
+chapters.
+
+
+\subsubsection{Disagreements on Chaos}
+As was suggested above, there is some disagreement within the 
+mathematical community over what counts as chaos.  Of the three conditions
+mentioned above, the first two (density of periodic orbits in $I$ and
+transitivity of $f$ over $I$) are topological or require no notion of
+distance.  The third condition entails a notion of distance 
+and so applies only to special cases of dynamical systems where the 
+state space is a metric space.  The lyapunov exponential separation
+method is an extension of this metric-based condition.  The disagreement
+centers around the degree of purity in our definition of chaos.  However,
+for the purpose here of understanding neuron dynamics in the computational
+domain, measurement is a must.  
+
+\subsubsection{Strange Attractors}
+
+The $\omega$-set or \textit{limit set} of a dynamical system is the set 
+of points in the state
+space to which all trajectories converge as $t \rightarrow \infty$.  For a 
+linear system with a single sink equilibrium $\vec{x}^{*}$, 
+$\omega=\{\vec{x}^{*}\}$.  For a linear system with a single source equilibrium,
+$\omega=\{\}$.  For a system with a stable limit cycle, $\omega$ includes
+every point on that limit cycle plus any other stable fixed points elsewhere
+in the state space.  
+
+Conversely, we say the $\alpha$-set for a system is the set of points
+in the state space to which all trajectories converge as 
+$t \rightarrow -\infty$.  This set includes all unstable fixed points and
+all points on unstable periodic orbits.
+
+For chaos to be possible, there must exist a chaotic attractor or 
+\textit{strange attractor} in
+the state space.  From the transitivity condition of chaos in a region, 
+points from every subregion must visit every other subregion in their
+flow.  A strange attractor, by definition, is not so strange; it is the
+$\omega$-set of the chaotic region, or, a subset of the periodic points of $f$
+that are also stable.  Its strangeness comes from the requirement that it
+must be dense in the region and therfore occupy every subregion of the region
+and yet still be a subset of that region.  
+Chaotic attractors on the real line typically resemble Cantor's middle-thirds
+set or Cantor's dust.
+The Smale Horseshoe map is
+a symbolic dynamical system constructed for the purpose of demonstrating 
+just such a set:  an $\omega$-set that is a vanishingly small subset of 
+the chaotic region that is invariant and dense in that region.
+
+As an aside towards computer scientists, the Smale Horseshoe map serves
+a function for dynamical systems theory quite similar to the 
+boolean satisfiability problem ($SAT$) in computing theory.  Formalized by
+Stephen Cook, $SAT$ was the first
+problem to be shown to be in the set NP-complete, which informally, means that
+it is as hard as 'the hardest problem in the set NP' and is itself in the set
+NP.  For a problem in question $Q$, showing $SAT \leq_{m}^{p} Q$, which is 
+read as 'SAT is polynomial time many-to-one reducible to Q', 
+and showing that $Q$ is in NP is sufficiently 
+rigorous proof that $Q$ is in NP-Complete.  
+
+In practice, reduction of $SAT$ to $Q$ is shown by providing a function $f$ 
+such that
+$SAT(x) = f^{-1}(Q(f(x)))$ for all $x$ where $f$ runs in polynomial time.
+Furthermore, this determination of upper-bounds is transitive so reduction 
+to $Q$ from any $SAT$-reducible problem is also sufficient.\cite{complexity}
+
+Stephen Smale's Horeshoe map $F_{Smale}$ was the first map to be shown to 
+have a strange
+attractor (actually disproving his own conjecture that no such sets existed)
+\cite{history}.  To show that a system $f : U \rightarrow U$ is chaotic
+on $U$, 
+it is sufficient
+to show that $(f,U)$ has a chaotic attractor.  To show that it has a
+chaotic attractor it is sufficient to show that it is topologically conjugate
+to the Smale Horsehoe map.  To show conjugacy, it is sufficient
+to provide a homeomorphism $h(x)$ such that $h(F_{Smale}(x)) = f(h(x))$.
+The set of flows of $F_{Smale}$ is continuously mapped to the
+corresponding set of flows of $f$ which must then share continuously
+mapped $\alpha$ and $\omega$-sets.  Since $F_{Smale}$ has a strange
+attractor, so too does $f$.
+
+\textit(Rough Draft note:)  -- I do not anticipate results regarding
+a strange attractor.  The much studied Lorenz system, constructed and
+popularized in the '70s, was only proven to have a strange attractor
+in 2001 \cite{warwick}.
+
+\section{Reservoir Computing}
+In 2002, Jaeger and Maass independently published results on supervised
+learning architectures for recurrent neural networks, analog in the former
+and digital in the latter.
+
+\textbf{TODO} - why do we care about time-series classification?
+
+There are a number of complications regarding
+recurrent learning rules.  For an example of one of the most frustrating,
+see Doya 1992.  Much of supervised machine learning is a variant of the
+gradient descent technique.  Thematically, the parameter space is searched
+by iteratively inching towards parameter configurations which, under
+some evaluation function $F_{task}$, more optimally perform the desired task.
+This is a mature technique for linear systems for which the shape of 
+the parameter space evaluated under $F_{task}$ is continuous and differentiable everywhere.
+
+Nonlinear systems are prone to bifurcation points in their respective 
+parameter spaces \cite{doya}.
+Consequently, gradient descent algorithms are generally insufficient.
+
+Jaeger and Maass' techniques both consist of building a randomly constructed,
+non-learning, and recurrent
+'reservoir' of neurons whose output is connected to a linear readout.
+
+\textbf{TODO - regurgitate Maass' liquid metaphor}
+
+%\textbf{TODO - diagram of the reservoir-readout model}
+
+The performance of these systems can vary wildly.  The random construction of
+the reservoir leaves it prone to doing any number of unproductive things
+to its input.  Fortunately, some metrics over the dynamical behavior of
+reservoirs have been proposed.  Systems for which these metrics are optimized
+result in sharp performance increases at task-learning for the linear readout.
+
+One such metric is the average degree of linear 
+indepenence among reservoir
+states over time.  Intuitively, optimizing this makes sense.  
+A linear classification
+readout would have more degrees of freedom with which to work if the
+state vectors at all the sampled timesteps filled out their vector space.
+
+%While there are positive experimental results published for this metric,
+%      there is a theoretical problem.  One can construct a toy system which
+%      maximizes linear independence among its iterates but yet its iterates
+%      contain no information about the input.  
+%      \textbf{TODO} -- describe that toy system in detail (not in the 
+%                       survey section).
+
+Another such metric is the maximal lyapunov exponent of the system.  
+Maass' prescription
+is to randomly search for reservoirs that have a maximal lyapunov exponent
+greater than, but nearly 0.  This gives systems whose inputs' trajectories
+exponentially diverge, but by as small an exponent as possible.  The 
+experimentally determined high performance of these systems is what has
+triggered excitement around computing 'at the edge of chaos'.
+
+More qualitatively, Maass' work describes two antagonistic properties of 
+computationally powerful reservoirs.  They must have both the \textit{
+    Separation Property} and \textit{Fading Memory}.
+
+    A state vector of a system with fading memory contains in it some
+    information about past inputs up through some maximum time window.
+    Alternatively, a system with fading memory has the property that 
+    two different trajectories which may be far apart will converge to
+    the same orbit if they begin receiving identical input.
+
+
+    The separation property, on the other hand, entails that two different
+    online signals evolve as different and separate trajectories through
+    the state space.
+
+    Chaotic systems clearly have the separation property, but they have poor
+    fading memory.  Highly ordered systems have the fading memory property, 
+    but separate their inputs only weakly if at all.
+
+    The above observations coupled with the accumulating positive 
+    experimental results make further investigation of these new 
+    techniques an interesting avenue.
+
+\section{Spiking Neurons}
+\textbf{ TODO } - this entire section.  Cite Dayan and Abbot and Maass' books.
+General discussion
+  need more in the long run
+
+\textbf{TODO}
+Hodgkin-Huxley
+
+\textbf{TODO}
+Leaky Integrate and Fire
+
+\textbf{TODO}
+Izhikevich
+
+\textbf{TODO}
+FitzHugh-Naguma (!)
+\section{Fundamental Problems and Future Work}
+\textbf{TODO}
+finish this document (figures, in particular)
+
+\textbf{TODO}
+workable model (FitzHugh-Naguma) -- extend and introduce third dimension.
+
+\textbf{TODO}
+considering inputs
+
+\textbf{TODO}
+nullcline decomposition $\rightarrow$ poincare map $\rightarrow$ attractors?
+
+\textbf{TODO}
+edge of chaos via lyapunov work
+
+\section{Bibliography...}
+\textbf{TODO}
+ \begin{thebibliography}{widest-label}
+  \bibitem[hirsch]{hirsch}
+   literature citation ...
+    ....
+     \end{thebibliography}
+  
+\end{document}

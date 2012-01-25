@@ -1,202 +1,134 @@
 #!/usr/bin/python
-
-import inputs, datastore, simulator
-import constants
-from math import sqrt, log, fabs
-
-import sys, time
-import network
+from time import time
 from random import random, randint
+import shelve, sys, gc, os
 
-# A metric of the diversity of the population.
-# If every individual is the same, the value is 0
-#  ( Treat each individual as a Q-dimensional vector,
-#    elements are the entries in the constraint matrix
-#    as well as a few samplings of their input f(x) )
-#  Use distance formula or some sort of metric I find
-#   online.
-def diversity(pop):
-    # Specifically, calculate the sum of the distances of every organism from
-    #  every other organism.
-    c_tot, i_tot = 0,0
-    for org in pop:
-        for other in pop:
-            c_tot = c_tot + weights_dist(org, other)/(float(len(pop))**2)
-            i_tot = i_tot + input_dist(org, other)/(float(len(pop))**2)
-    return c_tot, i_tot
-
-def weights_dist(o1, o2):
-    c1, c2 = o1['weights'], o2['weights']
-    tot = 0
-    for r in xrange(len(c1)):
-        for c in xrange(len(c2)):
-            tot = tot + (c1[r][c] - c2[r][c])**2
-    return sqrt(tot)
-
-def input_dist(o1, o2):
-    i1, i2 = o1['input'], o2['input']
-    eqns1 = inputs.input_as_lambdas(i1)
-    eqns2 = inputs.input_as_lambdas(i2)
-    syst1 = { 'n' : 2, 'consts' : [], 'eqns' : eqns1 }
-    syst2 = { 'n' : 2, 'consts' : [], 'eqns' : eqns2 }
-    test_iterates = (constants.num_warmup_iterations +
-                     constants.num_measur_iterations )
-    x1, x2 = [0,0], [0,0]
-    traj1, traj2 = [], []
-    for i in xrange(test_iterates):
-        traj1.append(x1)
-        traj2.append(x2)
-        x1 = simulator.iterate(syst1, x1)
-        x2 = simulator.iterate(syst2, x2)
-    diff = [(fabs(traj1[i][1] - traj2[i][1]))/test_iterates 
-                  for i in xrange(len(traj1))]
-    dist = log(log(sqrt(sum(diff))+1)+1)
-    return dist
-
-def test_input_dist():
-    i1 = inputs.build_random_input()
-    i2 = inputs.build_random_input()
-    print "i1:", inputs.input_to_string(i1)
-    print "i2:", inputs.input_to_string(i2)
-    print "dist:", input_dist({'input':i1}, {'input':i2})
-
-def crossover(o1, o2):
-    mutation_rate = constants.mutation_rate
-    o = {}
-    o['weights']    =crossover_weights(    o1['weights'],  o2['weights'])
-    o['input']      =crossover_inputs(     o1['input'],    o2['input']  )
-    if random() < mutation_rate:
-        o = mutate(o)
-    o['fitness']    =fitness(o)
-    return o
-
-def crossover_weights(c1, c2):
-    r,c = randint(0,len(c1)-1), randint(0,len(c1[0])-1)
-    child = [row for row in c1]
-    child[r:] = [row for row in c2[r:]]
-    child[r][:c] = [ele for ele in c1[r][:c]]
-    return child
-
-def crossover_inputs(i1, i2):
-    # Let the inputs module handle this.  Its messy.
-    return inputs.crossover(i1,i2)
+import crossover as cvr
+import mutation  as mut
+import metrics   as mtr
+import selection as sel
 
 
-def mutate(o):
-    if random() < 0.5:
-        o['weights'] = mutate_weights(o['weights'])
-    else:
-        o['input'] = mutate_input(o['input'])
-    return o
+# A constant:
+num_trials = 4
+max_gens = 3500
 
-def mutate_weights(weights):
-    r,c = randint(0, len(weights)-1), randint(0, len(weights[0])-1)
-    weights[r][c] = weights[r][c]*random()*2 + (random()*2-1)
-    return weights
 
-def mutate_input(input):
-    # Let the inputs module handle this.  Its messy.
-    return inputs.mutate(input)
 
-# TODO -- determine fitness variability with a coded test.
-def fitness(o, num_instances=constants.num_instances):
-    if 'fitness' in o:
-        return o['fitness']
-    net = network.instantiate(o['weights'], o['input'])
-    return simulator.measure_lyapunov(net)
+# Print things to stdout and log things that need logging
+def IO_update(ID, generation, pop, max_gens):
+    # Print update to stdout:
+    print "\rL: %f  a: %f      (%%%i done.)" \
+            % ( mtr.fitness(pop[0]), pop[0]['amplitude'],
+                    100.0 * float(generation)/(max_gens-1)),
+    sys.stdout.flush()
 
-# Initialize an organism
-#  n is the number of neurons in the systems to be represented.
-def init_organism(n):
-    # Organisms are python dictionaries
-    o = {   'weights'     : network.build_random_weights(n),
-            'input'       : inputs.build_random_input() }
-    # Cache the fitness
-    o['fitness'] = fitness(o)
-    return o
+    # Log stuff to file with shelve
+    d = shelve.open("dat/" + str(ID) + "/" +
+                    str(ID) + "." + str(generation) + ".pop" )
+    d['pop'] = pop
+    d.close()
 
-# Initialize a population.
-#  N is the number of organisms in the population.
-#  n is the number of neurons in networks.
-def init_population(N=constants.num_organisms_in_population, 
-                    n=constants.num_neurons):
-    n = constants.num_neurons
-    N = constants.num_organisms_in_population
-    print "Initializing population.  N =", N, "n =", n
-    assert(N >= 4)
-    assert(n >= 2)
+
+def initialize_pop():
+    # Some initialization constants:
+    lower_size = 2
+    upper_size = 50
+    num = 100
+
     pop = []
-    for i in xrange(N):
-        print "\r%", 100.0*float(i)/N,
+    for j in range(num):
+        print "\rInitializing Population        %%%i" % (100*float(j)/(num-1)),
         sys.stdout.flush()
-        o = init_organism(n)
-        while fitness(o) < -10000000:
-            o = init_organism(n)
-        pop.append(o)
-    print "Done."
+        org = { 'org':
+           [[random()*2-1 for i in range(randint(lower_size, upper_size))],
+            [0,0,0]],
+           'amplitude' : random() * 0.1 + 0.05 }
+        org['fitness'] = mtr.fitness(org)
+        pop.append(org)
+    print "  Done."
     return pop
 
+def handle_args():
+    if len(sys.argv) != 5:
+        print "Usage:"
+        print "  ga.py <comparator> <crossover> <selection> <trial>"
+        print "Got:"
+        print "  " + " ".join(sys.argv)
+        sys.exit(1)
 
-def selection(population):
-    indices = []
-    for i in xrange(4):
-        index = randint(0,len(population)-1)
-        while index in indices:
-            index = randint(0,len(population)-1)
-        indices.append(index)
+    cmp_fnc   = int(sys.argv[1])
+    c_over_op = int(sys.argv[2])
+    select_op = int(sys.argv[3])
+    trial     = int(sys.argv[4])
 
-    p1, p2 = population[indices[0]], population[indices[1]]
-    p3, p4 = population[indices[2]], population[indices[3]]
+    return cmp_fnc, c_over_op, select_op, trial
 
-    if fitness(p1) > fitness(p2):
-        winner1, loser1 = p1, p2
-    else:
-        winner1, loser1 = p2, p1
+def already_computed(ID, gen, silent=False):
+    pop = None
+    d = shelve.open("dat/"+ID+"/"+ID+"."+str(gen) + ".pop")
+    if 'pop' in d:
+        prog = 100.0 * float(gen)/(max_gens-1)
+        if not silent:
+            print "\rAlready computed; skipping ahead.  (%%%i)" % prog,
+            sys.stdout.flush()        # Update our percentage ticker.
+        pop = d['pop']                # Load that population into memory.
+    d.close()
+    return pop
 
-    if fitness(p3) > fitness(p4):
-        winner2, loser2 = p3, p4
-    else:
-        winner2, loser2 = p4, p3
+def combo_to_ID(cmp_fnc, c_over_op, select_op, trial):
+    return str(cmp_fnc)+"."+str(c_over_op)+"."+str(select_op)+"."+str(trial)
 
-    # Fitness is measured before crossover is complete and automatically
-    #  cached in a tuple.  child1 and child2 should be tuples now.
-    child1 = crossover(winner1, winner2)
-    child2 = crossover(winner2, winner1)
+def do_experiment(cmp_fnc, c_over_op, select_op, trial, force=False):
+    ID = combo_to_ID(cmp_fnc, c_over_op, select_op, trial)
 
-    ## Only replace losers if children are more fit
-    #if ( fitness(child1) > fitness(loser1) ):
-    #    population[population.index(loser1)] = child1
-    #if ( fitness(child2) > fitness(loser2) ):
-    #    population[population.index(loser2)] = child2
-    ## Or .. just replace them anyways:
-    population[population.index(loser1)] = child1
-    population[population.index(loser2)] = child2
+    cmp_fnc   = mtr.fn_list[cmp_fnc]
+    c_over_op = cvr.fn_list[c_over_op]
+    select_op = sel.fn_list[select_op]
 
-    population.sort(lambda x,y : cmp(fitness(x), fitness(y)))
+    print "ID:", ID,
+    print str(cmp_fnc)[10:-15],str(c_over_op)[10:-15],str(select_op)[10:-15]
 
-    return population
+    pop = already_computed(ID, max_gens-1)
+    if pop:
+        return
 
-# Main method.
-def run(ID):
-    print "Running special test with ID:", ID
-    for n in range(2, 20):
-        constants.num_neurons = n
-        population = init_population()
-        datastore.store(population, 0, ID)
-    print "Dieing early."
-    return
-
+    pop = None
     generation = 0
-    while ( True ):
-        datastore.store(population, generation, ID)
-        generation = generation + 1
-        population = selection(population)
+    while ( generation < max_gens ):
+        tmp = already_computed(ID, generation)
+        if tmp:
+            # Iteratively load saved generations up to where we stopped before
+            pop, generation = tmp, generation + 1
+            continue
 
+        # Initialize our population if we haven't already
+        if not pop:
+            pop = initialize_pop()
+
+        # Otherwise we need to compute!
+        pop.sort(lambda x,y : mtr.comparator(x,y, cmp_fnc) )  # Eval and sort
+        IO_update(ID, generation, pop, max_gens)              # Spit out status
+        pop = select_op(pop, c_over_op, cmp_fnc)              # Breed
+        generation = generation + 1                           # Tick
+
+        # Forcibly revaluate the fitness of the hero.
+        try:
+            del pop[0]['fitness']
+        except KeyError:
+            pass
 
 if __name__ == '__main__':
-    ID = int(time.time())
-    if len(sys.argv) > 1:
-        ID = sys.argv[1]
-    run(ID)
-    #test_input_dist()
+    # Get the function pointers from the arg list
+    cmp_fnc, c_over_op, select_op, trial = handle_args()
+
+    # Do and time the experiment
+    t1 = time()
+    do_experiment(cmp_fnc, c_over_op, select_op, trial)
+    t2 = time()
+
+    # Report back so we can better estimate.
+    print
+    #print "Experiment took", str((t2-t1)/(60.0*60.0)), "hours."
+    print
 
