@@ -1,0 +1,40 @@
+800 of 800 (%100.000000) are done.
+Proceeding to score those already done.
+
+Fitness functions.
+tan_combo_metric 200                 min 0.001078   avg 0.199405
+divi_metric 200                      min 0.021248   avg 0.259698
+plus_metric 200                      min 0.045094   avg 0.283053
+piecewise_metric 200                 min 0.021002   avg 0.092758
+
+Crossover operators.
+random_single_point 80              min 0.016584   avg 0.173428
+fixed_single_point 80               min 0.024325   avg 0.245391
+gaussian_merge 80                   min 0.021655   avg 0.222666
+binary_random_single_point 80       min 0.021248   avg 0.184123
+binary_fixed_single_point 80        min 0.015576   avg 0.213345
+fft_random_single_point 80          min 0.010714   avg 0.174865
+fft_fixed_single_point 80           min 0.023137   avg 0.253200
+fft_gaussian_merge 80               min 0.002770   avg 0.184745
+fft_binary_random_single_point 80   min 0.001078   avg 0.186835
+fft_binary_fixed_single_point 80    min 0.022892   avg 0.248685
+
+Selection methods.
+non_greedy_selection 160             min 0.002770   avg 0.276603
+greedy_selection 160                 min 0.001078   avg 0.221014
+greedy_mutant_hero 160               min 0.021655   avg 0.184394
+non_greedy_mutant_hero 160           min 0.009510   avg 0.150492
+mutant_hero 160                      min 0.015576   avg 0.211140
+
+Sorting by minimal amplitude.
+Top 10 overall combinations.
+0.8.1.2: 0.001078 : tan_combo_metric fft_binary_random_single_point greedy_selection  Trial:2
+0.7.0.2: 0.002770 : tan_combo_metric fft_gaussian_merge non_greedy_selection  Trial:2
+0.8.3.2: 0.009510 : tan_combo_metric fft_binary_random_single_point non_greedy_mutant_hero  Trial:2
+0.5.3.3: 0.010714 : tan_combo_metric fft_random_single_point non_greedy_mutant_hero  Trial:3
+0.4.4.0: 0.015576 : tan_combo_metric binary_fixed_single_point mutant_hero  Trial:0
+0.0.3.0: 0.016584 : tan_combo_metric random_single_point non_greedy_mutant_hero  Trial:0
+0.5.3.2: 0.018824 : tan_combo_metric fft_random_single_point non_greedy_mutant_hero  Trial:2
+3.7.4.2: 0.021002 : piecewise_metric fft_gaussian_merge mutant_hero  Trial:2
+1.3.4.3: 0.021248 : divi_metric binary_random_single_point mutant_hero  Trial:3
+0.2.2.1: 0.021655 : tan_combo_metric gaussian_merge greedy_mutant_hero  Trial:1

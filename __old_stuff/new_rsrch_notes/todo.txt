@@ -1,0 +1,21 @@
+   There are several approaches to using the neural networks for control of chaotic processes. First,
+many studies rely on the universal ability of the neural networks to control and predict behavior
+of the nonlinear systems. Since the chaotic systems are basically nonlinear, the potentiality of
+their neural control is not surprising. Some universal neural-like learning networks for control of
+nonlinear systems were suggested in [150, 151, 239]. The structures of neural networks for control
+and prediction of the processes in nonlinear chaotic systems can be found in [61, 107, 145]. The
+papers [169, 245] compare the neural approach with other methods of control. It was proposed in
+[192, 284] to use the genetic algorithms for learning the neural network. A numerical example is
+considered, and the results of modeling are presented for it.
+   Second, many papers describe identification of the controlled plants by the neural networks
+combined with a standard method of control of chaotic systems such as the OGY-method [132],
+proportional feedback controller [170], and so on. Identification often is carried out in the closed
+loop in the course of normal system operation, which leads to adaptive or learning controllers. It was
+                                     AUTOMATION AND REMOTE CONTROL             Vol. 64 No. 5   2003
+                                        CONTROL OF CHAOS                                        697
+noted that the chaotic nature of the system processes speeds up identification and learning owing
+to diversification of the learning sample [92, 226, 251]. Some papers study new, nontraditional
+algorithms of identification and control. For example, [110] proposes a new approach to learning
+(adjustment of weights and modification of structure) of a serial neural network which lies in using
+controller, chaotic neural filter, and associative memory.
+

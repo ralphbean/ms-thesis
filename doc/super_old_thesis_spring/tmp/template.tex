@@ -1,0 +1,554 @@
+\documentclass{elsart}
+
+\usepackage{amssymb}
+\usepackage{multirow}
+
+\begin{document}
+
+\begin{frontmatter}
+
+\title{Title}
+
+\author{Ralph Bean}
+
+\end{frontmatter}
+
+\section{Problem 1}
+Luckily, the question constrains the solutions to those with only $3$ 
+active S-boxes.  Since the input bit $P_{16}$ must involve S-box
+$S_{1,4}$ and the output bits $U_{4,1}$ and $U_{4,9}$ must involve S-box
+$S_{3,1}$, that leaves open for the third active S-box only
+$S_{2,1}, S_{2,2}, S_{2,3},$ and $S_{2,4}$.  All bit combinations involving
+three S-boxes must be evaluated, but since only one bit of input to
+$S_{3,1}$ comes from each S-box in layer two and only one bit of output
+from $S_{1,4}$ goes to each layer $2$ S-box, the number of combinations
+to search is $4$.
+
+\subsection{Involving $S_{2,1}:$}
+We use the following approximation of the S-box where the bias, $\epsilon$ is retrieved from the appropriate entry in the linear approximation table from homework 5.  $X_{4}$ and $X_{1}$ are taken to be the least and most significant bits, respectively.  For instance, the table index for $X_{1} \oplus X_{3}$ would be $A$ in hex.
+
+\begin{eqnarray*}
+S_{1,4}: &X_{4}=Y_{1} &\rightarrow \epsilon=-\frac{1}{4} \\
+S_{2,1}: &X_{4}=Y_{1} &\rightarrow \epsilon=-\frac{1}{4} \\
+S_{3,1}: &X_{1}=Y_{1} \oplus Y_{3} &\rightarrow \epsilon=-\frac{1}{4}
+\end{eqnarray*}
+Let $T_{1}, T_{2}, T_{3}$ be random variables such that
+\begin{eqnarray*}
+T_{1} = &U_{1,16} \oplus V_{1,13} &\rightarrow \epsilon_{1}=-\frac{1}{4} \\
+T_{2} = &U_{2,4} \oplus V_{2,1} &\rightarrow \epsilon_{2}=-\frac{1}{4} \\
+T_{3} = &U_{3,1} \oplus V_{3,1} 
+  \oplus V_{3,3} &\rightarrow \epsilon_{3}=-\frac{1}{4}
+\end{eqnarray*}
+$T_{1} \oplus T_{2} \oplus T_{3}$ can be expressed as as the XOR of plaintext bits, subkey bits, and bits of input to the last round.
+
+$$V_{1,16} = U_{1,13} = P_{16} \oplus K_{1,16}$$
+$$V_{2,1} = U_{2,4} = V_{1,13} \oplus K_{2,4}$$
+$$V_{3,1} \oplus V_{3,3} = U_{3,1} = V_{2,1} \oplus K_{3,1}$$
+Giving:
+
+\begin{eqnarray*}
+0 &=& T_{1} \oplus T_{2} \oplus T_{3} \\
+    &=& (U_{1,16} \oplus V_{1,13}) \oplus  (U_{2,4} \oplus V_{2,1}) 
+            \oplus (U_{3,1} \oplus V_{3,1} \oplus V_{3,3}) \\
+    &=& ((P_{16} \oplus K_{1,16}) 
+            \oplus (P_{16} \oplus K_{1,16})) \oplus \\
+    & & ((P_{16} \oplus K_{1,16} \oplus K_{2,4}) 
+            \oplus (P_{6} \oplus K_{1,16} \oplus K_{2,4})) \oplus \\
+    & & ((P_{16} \oplus K_{1,16} \oplus K_{2,4} \oplus K_{3,1}) 
+            \oplus (V_{3,1}) \oplus (V_{3,3})) \\
+    &=& P_{16} \oplus K_{1,16} \oplus K_{2,4} \oplus K_{3,1} 
+            \oplus V_{3,1} \oplus V_{3,3} \\
+    &=& P_{16} \oplus K_{1,16} \oplus K_{2,4} \oplus K_{3,1}
+            \oplus (U_{4,1} \oplus K_{4,1}) 
+            \oplus (U_{4,9} \oplus K_{4,9}) \\
+    &=& P_{16} \oplus U_{4,1} \oplus U_{4,9} 
+            \oplus (K_{1,16} \oplus K_{2,4} \oplus K_{3,1} 
+            \oplus K_{4,1} \oplus K_{4,9}) \\
+\end{eqnarray*}
+If the key bits are fixed, the bias of $P_{16} \oplus U_{4,1} \oplus U_{4,9}$
+is given by the piling-up lemma 
+\begin{eqnarray*}
+\epsilon &=& 2^{k-1} \displaystyle\prod_{i=1}^k \epsilon_{i} \\
+\epsilon &=& 2^{3-1} * \epsilon_{1}\epsilon_{2}\epsilon_{3} \\
+\epsilon &=& 4 * (-\frac{1}{4})(-\frac{1}{4})(-\frac{1}{4}) \\
+\epsilon &=& -\frac{1}{16}
+\end{eqnarray*}
+Thus the bias of $T_{1} \oplus T_{2} \oplus T_{3} = 0$ for this set of S-boxes 
+is either $\frac{1}{16}$ or $-\frac{1}{16}$.
+
+\newpage
+\subsection{Involving $S_{2,2}:$}
+We use the following approximation of the S-box:
+\begin{eqnarray*}
+S_{1,4}: &X_{4}=Y_{2} &\rightarrow \epsilon=\frac{1}{8} \\
+S_{2,2}: &X_{4}=Y_{1} &\rightarrow \epsilon=-\frac{1}{4} \\
+S_{3,1}: &X_{2}=Y_{1} \oplus Y_{3} &\rightarrow \epsilon=\frac{1}{8}
+\end{eqnarray*}
+Let $T_{1}, T_{2}, T_{3}$ be random variables such that
+\begin{eqnarray*}
+T_{1} = &U_{1,16} \oplus V_{1,14} &\rightarrow \epsilon_{1}=\frac{1}{8} \\
+T_{2} = &U_{2,8} \oplus V_{2,5} &\rightarrow \epsilon_{2}=\frac{1}{4} \\
+T_{3} = &U_{3,2} \oplus V_{3,1} \oplus V_{3,3} 
+  &\rightarrow \epsilon_{3}=\frac{1}{8}
+\end{eqnarray*}
+
+Apply the piling-up lemma:
+\begin{eqnarray*}
+  \epsilon &=& 2^{k-1} \displaystyle\prod_{i=1}^k \epsilon_{i} \\
+  \epsilon &=& 2^{3-1} * \epsilon_{1}\epsilon_{2}\epsilon_{3} \\
+  \epsilon &=& 4 * (\frac{1}{8})(-\frac{1}{4})(\frac{1}{8}) \\
+  \epsilon &=& -\frac{1}{64}
+\end{eqnarray*}
+Giving us a bias for this set of S-boxes as either $\frac{1}{64}$ 
+or $-\frac{1}{64}$.
+\newpage
+\subsection{Involving $S_{2,3}:$}
+We use the following approximation of the S-box:
+\begin{eqnarray*}
+S_{1,4}: &X_{4}=Y_{3} &\rightarrow \epsilon=-\frac{1}{8} \\
+S_{2,3}: &X_{4}=Y_{1} &\rightarrow \epsilon=-\frac{1}{4} \\
+S_{3,1}: &X_{3}=Y_{1} \oplus Y_{3} &\rightarrow \epsilon=\frac{1}{8} \\
+T_{1} = &U_{1,6} \oplus V_{1,7} &\rightarrow \epsilon_{1}=-\frac{1}{8} \\
+T_{2} = &U_{2,10} \oplus V_{2,9} &\rightarrow \epsilon_{2}=-\frac{1}{4} \\
+T_{3} = &U_{3,3} \oplus V_{3,1} \oplus V_{3,3} 
+  &\rightarrow \epsilon_{3}=\frac{1}{8}
+\end{eqnarray*}
+Apply the piling-up lemma:
+\begin{eqnarray*}
+  \epsilon &=& 2^{k-1} \displaystyle\prod_{i=1}^k \epsilon_{i} \\
+  \epsilon &=& 2^{3-1} * \epsilon_{1}\epsilon_{2}\epsilon_{3} \\
+  \epsilon &=& 4 * (-\frac{1}{8})(-\frac{1}{4})(\frac{1}{8}) \\
+  \epsilon &=& \frac{1}{64}
+\end{eqnarray*}
+Giving us a bias for this set of S-boxes as either $\frac{1}{64}$ 
+or $-\frac{1}{64}$.
+\newpage
+\subsection{Involving $S_{2,4}:$}
+We use the following approximation of the S-box:
+\begin{eqnarray*}
+S_{1,2}: &X_{4}=Y_{4} &\rightarrow \epsilon=\frac{1}{8} \\
+S_{2,4}: &X_{4}=Y_{1} &\rightarrow \epsilon=-\frac{1}{4} \\
+S_{3,1}: &X_{4}=Y_{1} \oplus Y_{3} &\rightarrow \epsilon=-\frac{1}{4} \\
+T_{1} = &U_{1,6} \oplus V_{1,8} &\rightarrow \epsilon_{1}=\frac{1}{8} \\
+T_{2} = &U_{2,14} \oplus V_{2,13} &\rightarrow \epsilon_{2}=-\frac{1}{4} \\
+T_{3} = &U_{3,4} \oplus V_{3,1} \oplus V_{3,3}
+  &\rightarrow \epsilon_{3}=-\frac{1}{4}
+\end{eqnarray*}
+
+The bias of $T_{1} \oplus T_{2} \oplus T_{3} = 0$ is given by the 
+piling-up lemma.
+\begin{eqnarray*}
+  \epsilon &=& 2^{k-1} \displaystyle\prod_{i=1}^k \epsilon_{i} \\
+  \epsilon &=& 2^{3-1} * \epsilon_{1}\epsilon_{2}\epsilon_{3} \\
+  \epsilon &=& 4 * (\frac{1}{8})(-\frac{1}{4})(-\frac{1}{4}) \\
+  \epsilon &=& \frac{1}{32}
+\end{eqnarray*}
+Thus the bias of this S-box combination is either $\frac{1}{32}$ 
+or $-\frac{1}{32}$.
+
+\subsection{Solution}
+
+Now we have four S-box combinations that each estimate the bias of 
+$P_{16} \oplus U_{4,1} \oplus U_{4,9}$.  The biases of each of the 
+combinations are $\lbrace \frac{1}{16}, \frac{1}{64}, \frac{1}{64}, 
+             \frac{1}{32} \rbrace$
+The first of those, the one with the largest absolute bias, 
+    $\epsilon = \frac{1}{16}$, is the best linear approximation:
+\begin{eqnarray*}
+S_{1,4}&: &X_{4}=Y_{1} \\
+S_{2,1}&: &X_{4}=Y_{1} \\
+S_{3,1}&: &X_{1}=Y_{1} \oplus Y_{3} 
+\end{eqnarray*}
+
+\newpage
+\section{Problem 2}
+I wrote a program in python (attached) that attempts 100 times 
+to perform the linear cryptanalysis attack on the SPN.
+
+To summarize, for each attempt, a random, 80-bit key was generated and
+$8 * \epsilon^{-2}$ random, 16-bit plaintexts were generated for each 
+key where $epsilon=\frac{1}{16}$.  Each plaintext was encrypted through
+the SPN giving $8 * \epsilon^{-2}$ ciphertexts for each 80-bit key as well.
+Then, for each of these trials, the target partial subkey bits of
+$K_{1..4}$ and $K_{9..12}$ were searched through.  For each of the $256$ target partial subkeys, the each of the corresponding ciphertexts were sent back
+through the potential key, and then sent back through the last S-box layer 
+to layer $U_{4}$.
+That result coupled with the original plaintext for this attempt, allowed me
+to check and see if the original equation, $P_{16} \oplus U_{4,1} \oplus
+U_{4,9} = 0$, held true.  If it did, I incremented a counter for the current
+target partial subkey being tested, other wise I did nothing but moved on.
+
+The number of times the equation held true for a particular subkey was then 
+normalized and its deviation from 1/2 was taken.  Values more distant from 1/2
+indicate that the key is more probably.  Values closer to 1/2 indicate that
+the particular key has only a random effect on decryption.
+
+For the 100 trials I ran, my attack correctly found the target partial subkey
+bits 78 times.
+
+Following is a table of scores that my algorithm produced for the key 546440697430319697596099 and for 2048 plaintext-ciphertext pairs.  The actual target
+partial subkey bites were 1000 (8) and 1100 (c).
+
+\begin{tabular}{|l|l|l|}
+\hline
+\multicolumn{3}{|c|}{Key Scores} \\
+\hline
+$K_{5,(1..4)}$ & $K_{5(9..12)}$ & $|bias|$  \\ \hline
+\multirow{16}{*}{0} & 0 & 0.005859375 \\
+ & 1 & 0.03173828125 \\
+ & 2 & 0.0078125 \\
+ & 3 & 0.0087890625 \\
+ & 4 & 0.01953125 \\
+ & 5 & 0.013671875 \\
+ & 6 & 0.02587890625 \\
+ & 7 & 0.0107421875 \\
+ & 8 & 0.01123046875 \\
+ & 9 & 0.01806640625 \\
+ & a & 0.005859375 \\
+ & b & 0.01416015625 \\
+ & c & 0.01513671875 \\
+ & d & 0.005859375 \\
+ & e & 0.00634765625 \\
+ & f & 0.00634765625 \\ \hline
+\end{tabular} 
+\begin{tabular}{|l|l|l|}
+\hline
+\multicolumn{3}{|c|}{Key Scores} \\
+\hline
+$K_{5,(1..4)}$ & $K_{5(9..12)}$ & $|bias|$  \\ 
+\hline
+\multirow{16}{*}{1} & 0 & 0.02783203125 \\
+ & 1 & 0.021484375 \\
+ & 2 & 0.02880859375 \\
+ & 3 & 0.02685546875 \\
+ & 4 & 0.00341796875 \\
+ & 5 & 0.02197265625 \\
+ & 6 & 0.0009765625 \\
+ & 7 & 0.03759765625 \\
+ & 8 & 0.015625 \\
+ & 9 & 0.0009765625 \\
+ & a & 0.00634765625 \\
+ & b & 0.0146484375 \\
+ & c & 0.009765625 \\
+ & d & 0.04150390625 \\
+ & e & 0.0205078125 \\
+ & f & 0.03125 \\ \hline
+\end{tabular}
+
+\begin{tabular}{|l|l|l|}
+\hline
+\multicolumn{3}{|c|}{Key Scores} \\
+\hline
+$K_{5,(1..4)}$ & $K_{5(9..12)}$ & $|bias|$  \\ \hline
+ \multirow{16}{*}{2} & 0 & 0.01611328125 \\
+ & 1 & 0.03515625 \\
+ & 2 & 0.02685546875 \\
+ & 3 & 0.00927734375 \\
+ & 4 & 0.00048828125 \\
+ & 5 & 0.00048828125 \\
+ & 6 & 0.0087890625 \\
+ & 7 & 0.00830078125 \\
+ & 8 & 0.0029296875 \\
+ & 9 & 0.0078125 \\
+ & a & 0.00048828125 \\
+ & b & 0.009765625 \\
+ & c & 0.0263671875 \\
+ & d & 0.01513671875 \\
+ & e & 0.0068359375 \\
+ & f & 0.03515625 \\ \hline
+\end{tabular}
+\begin{tabular}{|l|l|l|}
+\hline
+\multicolumn{3}{|c|}{Key Scores} \\
+\hline
+$K_{5,(1..4)}$ & $K_{5(9..12)}$ & $|bias|$  \\ \hline
+\multirow{16}{*}{3} & 0 & 0.01318359375 \\
+ & 1 & 0.0126953125 \\
+ & 2 & 0.01513671875 \\
+ & 3 & 0.01513671875 \\
+ & 4 & 0.00830078125 \\
+ & 5 & 0.01611328125 \\
+ & 6 & 0.0 \\
+ & 7 & 0.00146484375 \\
+ & 8 & 0.0 \\
+ & 9 & 0.01171875 \\
+ & a & 0.01611328125 \\
+ & b & 0.001953125 \\
+ & c & 0.0048828125 \\
+ & d & 0.01513671875 \\
+ & e & 0.0009765625 \\
+ & f & 0.0048828125 \\ \hline
+ \end{tabular}
+ 
+\begin{tabular}{|l|l|l|}
+\hline
+\multicolumn{3}{|c|}{Key Scores} \\
+\hline
+$K_{5,(1..4)}$ & $K_{5(9..12)}$ & $|bias|$  \\ \hline
+\multirow{16}{*}{4} & 0 & 0.02978515625 \\
+ & 1 & 0.0234375 \\
+ & 2 & 0.02099609375 \\
+ & 3 & 0.01025390625 \\
+ & 4 & 0.00634765625 \\
+ & 5 & 0.00634765625 \\
+ & 6 & 0.0068359375 \\
+ & 7 & 0.03466796875 \\
+ & 8 & 0.015625 \\
+ & 9 & 0.0078125 \\
+ & a & 0.00537109375 \\
+ & b & 0.00390625 \\
+ & c & 0.005859375 \\
+ & d & 0.03271484375 \\
+ & e & 0.01953125 \\
+ & f & 0.0224609375 \\ \hline
+\end{tabular}
+\begin{tabular}{|l|l|l|}
+\hline
+\multicolumn{3}{|c|}{Key Scores} \\
+\hline
+$K_{5,(1..4)}$ & $K_{5(9..12)}$ & $|bias|$  \\ \hline
+ \multirow{16}{*}{5} & 0 & 0.00390625 \\
+ & 1 & 0.02099609375 \\
+ & 2 & 0.0166015625 \\
+ & 3 & 0.0009765625 \\
+ & 4 & 0.013671875 \\
+ & 5 & 0.0068359375 \\
+ & 6 & 0.00146484375 \\
+ & 7 & 0.0078125 \\
+ & 8 & 0.00537109375 \\
+ & 9 & 0.01416015625 \\
+ & a & 0.009765625 \\
+ & b & 0.00244140625 \\
+ & c & 0.02294921875 \\
+ & d & 0.0048828125 \\
+ & e & 0.01318359375 \\
+ & f & 0.01708984375 \\ \hline
+\end{tabular}
+
+\begin{tabular}{|l|l|l|}
+\hline
+\multicolumn{3}{|c|}{Key Scores} \\
+\hline
+$K_{5,(1..4)}$ & $K_{5(9..12)}$ & $|bias|$  \\ \hline
+ \multirow{16}{*}{6} & 0 & 0.01611328125 \\
+ & 1 & 0.021484375 \\
+ & 2 & 0.00048828125 \\
+ & 3 & 0.03271484375 \\
+ & 4 & 0.00732421875 \\
+ & 5 & 0.04150390625 \\
+ & 6 & 0.0263671875 \\
+ & 7 & 0.00830078125 \\
+ & 8 & 0.009765625 \\
+ & 9 & 0.0126953125 \\
+ & a & 0.00927734375 \\
+ & b & 0.0263671875 \\
+ & c & 0.0205078125 \\
+ & d & 0.01611328125 \\
+ & e & 0.0009765625 \\
+ & f & 0.0048828125 \\ \hline
+\end{tabular}
+\begin{tabular}{|l|l|l|}
+\hline
+\multicolumn{3}{|c|}{Key Scores} \\
+\hline
+$K_{5,(1..4)}$ & $K_{5(9..12)}$ & $|bias|$  \\ \hline
+ \multirow{16}{*}{7} & 0 & 0.02490234375 \\
+ & 1 & 0.0009765625 \\
+ & 2 & 0.02294921875 \\
+ & 3 & 0.03955078125 \\
+ & 4 & 0.00439453125 \\
+ & 5 & 0.02392578125 \\
+ & 6 & 0.0068359375 \\
+ & 7 & 0.01611328125 \\
+ & 8 & 0.0009765625 \\
+ & 9 & 0.0068359375 \\
+ & a & 0.01513671875 \\
+ & b & 0.015625 \\
+ & c & 0.0 \\
+ & d & 0.03369140625 \\
+ & e & 0.0166015625 \\
+ & f & 0.0205078125 \\ \hline
+\end{tabular}
+
+\begin{tabular}{|l|l|l|}
+\hline
+\multicolumn{3}{|c|}{Key Scores} \\
+\hline
+$K_{5,(1..4)}$ & $K_{5(9..12)}$ & $|bias|$  \\ \hline
+ \multirow{16}{*}{\textbf{8}} & 0 & 0.00048828125 \\
+ & 1 & 0.041015625 \\
+ & 2 & 0.03857421875 \\
+ & 3 & 0.00341796875 \\
+ & 4 & 0.04345703125 \\
+ & 5 & 0.00830078125 \\
+ & 6 & 0.013671875 \\
+ & 7 & 0.00048828125 \\
+ & 8 & 0.0078125 \\
+ & 9 & 0.03125 \\
+ & a & 0.02880859375 \\
+ & b & 0.0048828125 \\
+ & \textbf{c} & \textbf{0.0703125} \\
+ & d & 0.00927734375 \\
+ & e & 0.00390625 \\
+ & f & 0.0263671875 \\ \hline
+\end{tabular}
+\begin{tabular}{|l|l|l|}
+\hline
+\multicolumn{3}{|c|}{Key Scores} \\
+\hline
+$K_{5,(1..4)}$ & $K_{5(9..12)}$ & $|bias|$  \\ \hline
+ \multirow{16}{*}{9} & 0 & 0.02880859375 \\
+ & 1 & 0.0009765625 \\
+ & 2 & 0.00732421875 \\
+ & 3 & 0.03466796875 \\
+ & 4 & 0.00048828125 \\
+ & 5 & 0.02978515625 \\
+ & 6 & 0.0107421875 \\
+ & 7 & 0.03271484375 \\
+ & 8 & 0.0166015625 \\
+ & 9 & 0.001953125 \\
+ & a & 0.00830078125 \\
+ & b & 0.0224609375 \\
+ & c & 0.0234375 \\
+ & d & 0.04052734375 \\
+ & e & 0.021484375 \\
+ & f & 0.009765625 \\ \hline
+\end{tabular}
+
+\begin{tabular}{|l|l|l|}
+\hline
+\multicolumn{3}{|c|}{Key Scores} \\
+\hline
+$K_{5,(1..4)}$ & $K_{5(9..12)}$ & $|bias|$  \\ \hline
+ \multirow{16}{*}{a} & 0 & 0.01708984375 \\
+ & 1 & 0.0146484375 \\
+ & 2 & 0.00537109375 \\
+ & 3 & 0.01708984375 \\
+ & 4 & 0.00244140625 \\
+ & 5 & 0.00732421875 \\
+ & 6 & 0.0009765625 \\
+ & 7 & 0.00341796875 \\
+ & 8 & 0.001953125 \\
+ & 9 & 0.0107421875 \\
+ & a & 0.00146484375 \\
+ & b & 0.001953125 \\
+ & c & 0.0126953125 \\
+ & d & 0.01416015625 \\
+ & e & 0.0078125 \\
+ & f & 0.013671875 \\ \hline
+\end{tabular}
+\begin{tabular}{|l|l|l|}
+\hline
+\multicolumn{3}{|c|}{Key Scores} \\
+\hline
+$K_{5,(1..4)}$ & $K_{5(9..12)}$ & $|bias|$  \\ \hline
+ \multirow{16}{*}{b} & 0 & 0.0068359375 \\
+ & 1 & 0.02197265625 \\
+ & 2 & 0.015625 \\
+ & 3 & 0.0029296875 \\
+ & 4 & 0.015625 \\
+ & 5 & 0.0107421875 \\
+ & 6 & 0.01220703125 \\
+ & 7 & 0.009765625 \\
+ & 8 & 0.00341796875 \\
+ & 9 & 0.02490234375 \\
+ & a & 0.0185546875 \\
+ & b & 0.00732421875 \\
+ & c & 0.05029296875 \\
+ & d & 0.01171875 \\
+ & e & 0.01123046875 \\
+ & f & 0.02490234375 \\ \hline
+\end{tabular}
+
+\begin{tabular}{|l|l|l|}
+\hline
+\multicolumn{3}{|c|}{Key Scores} \\
+\hline
+$K_{5,(1..4)}$ & $K_{5(9..12)}$ & $|bias|$  \\ \hline
+ \multirow{16}{*}{c} & 0 & 0.02001953125 \\
+ & 1 & 0.03515625 \\
+ & 2 & 0.01123046875 \\
+ & 3 & 0.00439453125 \\
+ & 4 & 0.00341796875 \\
+ & 5 & 0.00537109375 \\
+ & 6 & 0.0048828125 \\
+ & 7 & 0.02490234375 \\
+ & 8 & 0.0126953125 \\
+ & 9 & 0.0166015625 \\
+ & a & 0.00732421875 \\
+ & b & 0.0029296875 \\
+ & c & 0.0029296875 \\
+ & d & 0.02197265625 \\
+ & e & 0.01171875 \\
+ & f & 0.0244140625 \\
+\hline
+\end{tabular}
+\begin{tabular}{|l|l|l|}
+\hline
+\multicolumn{3}{|c|}{Key Scores} \\
+\hline
+$K_{5,(1..4)}$ & $K_{5(9..12)}$ & $|bias|$  \\ \hline
+\multirow{16}{*}{d} & 0 & 0.00341796875 \\
+ & 1 & 0.0322265625 \\
+ & 2 & 0.02392578125 \\
+ & 3 & 0.02099609375 \\
+ & 4 & 0.02783203125 \\
+ & 5 & 0.01708984375 \\
+ & 6 & 0.0126953125 \\
+ & 7 & 0.00927734375 \\
+ & 8 & 0.001953125 \\
+ & 9 & 0.0302734375 \\
+ & a & 0.02197265625 \\
+ & b & 0.01953125 \\
+ & c & 0.044921875 \\
+ & d & 0.01025390625 \\
+ & e & 0.005859375 \\
+ & f & 0.0263671875 \\ \hline
+\end{tabular}
+
+\begin{tabular}{|l|l|l|}
+\hline
+\multicolumn{3}{|c|}{Key Scores} \\
+\hline
+$K_{5,(1..4)}$ & $K_{5(9..12)}$ & $|bias|$  \\ \hline
+ \multirow{16}{*}{e} & 0 & 0.0166015625 \\
+ & 1 & 0.03271484375 \\
+ & 2 & 0.0068359375 \\
+ & 3 & 0.0126953125 \\
+ & 4 & 0.021484375 \\
+ & 5 & 0.017578125 \\
+ & 6 & 0.01513671875 \\
+ & 7 & 0.0068359375 \\
+ & 8 & 0.01318359375 \\
+ & 9 & 0.02880859375 \\
+ & a & 0.0029296875 \\
+ & b & 0.00927734375 \\
+ & c & 0.04248046875 \\
+ & d & 0.0107421875 \\
+ & e & 0.00830078125 \\
+ & f & 0.01416015625 \\ \hline
+\end{tabular}
+\begin{tabular}{|l|l|l|}
+\hline
+\multicolumn{3}{|c|}{Key Scores} \\
+\hline
+$K_{5,(1..4)}$ & $K_{5(9..12)}$ & $|bias|$  \\ \hline
+ \multirow{16}{*}{f} & 0 & 0.01513671875 \\
+ & 1 & 0.0126953125 \\
+ & 2 & 0.01318359375 \\
+ & 3 & 0.03369140625 \\
+ & 4 & 0.00732421875 \\
+ & 5 & 0.02294921875 \\
+ & 6 & 0.0087890625 \\
+ & 7 & 0.00634765625 \\
+ & 8 & 0.001953125 \\
+ & 9 & 0.001953125 \\
+ & a & 0.00244140625 \\
+ & b & 0.0166015625 \\
+ & c & 0.0087890625 \\
+ & d & 0.02294921875 \\
+ & e & 0.0087890625 \\
+ & f & 0.0224609375 \\
+\hline
+\end{tabular}
+\end{document}

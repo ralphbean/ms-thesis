@@ -1,0 +1,42 @@
+\documentclass[12pt]{article}
+\begin{document}
+$$f(x) = tanh(x)$$
+$$f(x) = (1 + e^{-\mu x})^{-1}$$
+\[ W= \left( \begin{array}{cccc}
+     w_{1,1} & w_{1,2} & \cdots & w_{1,N} \\
+     w_{2,1} & w_{2,2} & \cdots & w_{2,N} \\
+     \vdots  & \vdots  & \ddots & \vdots \\
+     w_{N,1} & w_{N,2} & \cdots & w_{N,N} \end{array} \right)\]
+$$x_{i,t+1} = f(\Sigma_{j=0}^{N} w_{i,j}x_{j,t})$$
+$$\vec{x}_{t+1} = f(W \vec{x}_{t})$$
+
+$$L(f) = \lim_{t\rightarrow \infty} (J_{f}J_{f}^{T})^{\frac{1}{2t}}$$
+
+$$a_{1} < a_{2}$$
+
+$$L( f(x) + a_{1}S_{1} ) < L( f(x) + a_{2}S_{2} )$$
+
+$$L( f(x) + aS ) < 0$$
+
+$$a - \epsilon < 0$$
+
+$fitness(L, \alpha) =$
+
+\vspace{20pt}
+
+$L + \alpha$
+
+\vspace{10pt}
+
+$\frac{L}{\alpha}$
+
+\vspace{10pt}
+
+$tanh(L) + tanh( 10(\alpha - 0.12))$
+
+\vspace{10pt}
+
+$ (L > 0) ? L : \alpha$
+
+
+\end{document}

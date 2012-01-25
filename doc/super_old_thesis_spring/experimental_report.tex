@@ -1,0 +1,65 @@
+\documentclass{elsart3p}
+
+\usepackage{amssymb}
+\usepackage{multirow}
+\usepackage{graphicx}
+
+\begin{document}
+
+\begin{frontmatter}
+
+\title{Experimental Report}
+\author{Ralph Bean}
+
+\end{frontmatter}
+
+\section{Izhikevich Model}
+For part of my independant study this quarter, I implemented a spiking neural
+network simulation in matlab.  Although the model can be replaced with another, I did most of my experiments with the Izhikevich spiking neuron model which is defined by the following system of differential equations:
+\begin{eqnarray*}
+v^{\prime} &=& 0.04v^{2} + 5v + 140 - u + I \\
+u^{\prime} &=& a(bv - u)
+\end{eqnarray*}
+If $v \geq +30$mV, then $v \leftarrow c$ and $u \leftarrow u + d$.
+
+Here, $v(t)$ represents the internal voltage of the neuron at time $t$ in millivolts.  $u(t)$ is the recovery variable which approximates a number of quantities from the most accurate but computationally intractable Hodgin-Huxley model.
+
+Simulation of these equations was accomplished by simple euler integration.
+
+Although it has been done before, I carried out my own analysis of the Izhikevich model for the single neuron case.
+
+The first task was to find the nullclines of the system.  Setting $v^{\prime}=0$, we arrive at $u = 0.04v^{2} + 5v + 140 + I$ as the $v^{\prime}$-nullcline.  Setting $u^{\prime}=0$, then $u = bv$ is the $u^{\prime}$-nullcline.  
+
+
+\includegraphics[width=225pt]{figures/spikes.pdf}
+
+In figure 1, the top panel illustrates the internal voltage of a neuron over time which, due to its parameters $a=0.02, b=0.2, c=-50, d=2, I=15$, exhibits tonic bursting.  The bottom panel depicts the $v^{\prime}$ (parabola) and $u^{\prime}$ (slanted line) nullclines of that particular system.  The vertical line is given by the reset rule $v \leftarrow c$.
+
+\includegraphics[width=225pt]{figures/izhikevich_flow.pdf}
+
+Figure 2 depicts this same neuron from the same simulation but with its flow plotted in the $v-u$ plane.  You can see its trajectory begin at $(v_{0}, u_{0} = (-60, 0)$.  Each time it fires, $v$ is continually reset to $c$, but it is still in a region of excitability until enough values of $d$ have been added to $u$ to push the trajectory into a qualitatively different region (above the $v^{\prime}$-nullcline parabola).
+
+Analysis of different parameters for a neuron can be conducted \textit{without} simulating it by looking at the direction of the vector field in each of the (up to) eight different regions created by the intersection of the nullclines and the $v_{reset}$ line.  More generally, for any continuous dynamical system of the form:
+\begin{eqnarray*}
+x_{1}^{\prime} &=& f_{1}(x_{1},...,x_{n}) \\
+&.&\\
+&.&\\
+&.&\\
+x_{n}^{\prime} &=& f_{n}(x_{1},...,x_{n})
+\end{eqnarray*}
+the $x_{j}$-nullclines separate $\mathbb{R}^{n}$ into a collection of regions in which the $x_{j}$-components of the vector field point in either the positive or negative direction.  Determining all of the nullclines can be used to decompose $\mathbb{R}^{n}$ into a collection of open sets in each of which the vector field points in a 'particular direction'.  Such an approach is critical to local analysis of a dynamical system and is useful.
+\section{Networks of Neurons}
+To simulate a network of neurons, we must modify the Izhikevich equations to include spikes from other neurons.  For the $i$th neuron, let:
+\begin{eqnarray*}
+v_{i}^{\prime} &=& 0.04v_{i}^{2} + 5v_{i} + 140 - u_{i} + I_{i} + \sum_{j} \sum_{m} W_{ji} \alpha(t - t_{j}^{m} + D_{ji})\\
+u_{i}^{\prime} &=& a(bv_{i} - u_{i}) 
+\end{eqnarray*}
+Where $t_{j}^{m}$ is the time in milliseconds of the $m$th firing of the $j$th neuron.  $\alpha(t)$ is the postsynaptic current.  $W$ is the weight matrix where $W_{ji}$ is the weight of the connection from the $j$th neuron to this, the $i$th neuron.  $D$ is the delay matrix where $D_{ji}$ is the delay is milliseconds added to spikes from neuron $j$ bound for for neuron $i$.
+
+I implemented an event-driven simulation in matlab which accepts an integer $n$ for the number of neurons, a set of parameters $(a,b,c,d,I)$ to be applied identically to every neuron, a time $t_{stop}$ for the length of the simulation, and an $n$ by $1$ cell-array of input spike-times. 
+
+\includegraphics[width=225pt]{figures/network_spikes.pdf}
+
+The top panel of figure 3 shows a plot of the spike times of an input spike train to a recurrently connected network of 40 neurons with an equal distribution of excitatory and inhibitory weights and with delays ranging from 0 to 12 milliseconds.  The bottom panel shows the times of spikes fired by every neuron in the network over the simulation duration of 100ms.
+
+\end{document}

@@ -1,0 +1,94 @@
+\documentclass{article}
+\usepackage{multirow}
+
+\begin{document}
+\section{Introduction}
+My stated purpose at the beginning of the summer was to "derive constraints 
+on the
+parameters of a neural network such that the dynamics of the network under
+no input (i.e. the baseline behavior) of the network is chaotic."  In July,
+I informally proved that such there are no such
+solutions in the parameter space of an artificial (discrete-time) neural 
+network which makes use of the sigmoid (hyperbolic tangent) activation function
+only.  To be discussed more later, the choice of an activation function 
+dominates the dynamics of no-input networks over their histories.
+
+Section 2 is a formal statement of the proof.  Section 3 is a discussion
+of this result with respect to publications regarding Echo State
+Networks (ESNs).  Section 4 is a discussion of future work.
+
+\section{Artificial Neural Networks may not be Topologically Chaotic}
+\subsection{A Single Neuron Network}
+Chaos in one-dimensional discrete-time dynamical systems is much more well
+understood than in any other non-trivial class of systems.  Proof that
+a new one-dimensional system is chaotic may be done by the Sarkovskii's Theorem
+which, in its condensed form, states that any one-dimensional discrete-time dynamical system which
+has a periodic orbit of prime period $3$, has periodic orbits of every other prime period.  The natural numbers are countably infinite.  An infinite number of
+distinct periodic orbits on an open interval implies density (much like the argument for density of the rationals) and density of periodic orbits is the very topological definition of chaos.
+
+Our one-neuron recurrent network can be expressed as a dynamical system:
+$$x_{t+1} = f(x_{t}) = tanh(w*x_{t} + b)$$
+where $x_{t}$ is the state of the neuron at time $t$, $w$ is the weight of the connection from this neuron to itself, and $b$ is the bias of the neuron towards activation.  We have a one-dimensional phase space and a two-dimensional parameter space.
+
+One method I had my hopes on at the beginning of the summer was to use Sarkovskii's Thereom on the above equation and solve for $x = f(f(f(x)))$ and say "See, the equality only holds if $w$ and $b$ take on 'this' relationship."  
+However, due to our neuron's activation function being transcendtal and
+consequently, non-algebraic, $x = f(f(f(x)))$ eluded manipulation 
+(even intractable for mathematica).  
+
+An entirely different (and more often used) method of proving the existence
+of chaos in a dynamical system is to show that it is topologically conjugate
+to another known chaotic dynamical system such as the shift map, the smale horsehoe map,
+or the logistic map.
+These three are all defined quite differently but have nonetheless been 
+shown to be conjugate to one another.  To show topological conjugacy 
+between two dynamical systems $f(x)$ and $g(x)$, one must provide a 
+function, a homeomorphism, $h(x)$ such that $h^{-1} \circ f = g \circ h$.
+I hoped to provide a homeomorphism between our single-neuron artificial 
+neural network and the logistic map, $x_{t+1} = \mu x (1-x)$.  My many attempts at this failed.  Is there such an $h(x)$?
+
+\textit{Claim:}  A network of one recurrently connected neuron in the 
+absence on online input does not have a chaotic baseline for any 
+combination of parameters.
+
+\textit{Proof:}
+Let our neural network's change function be denoted by $g(x)$ and the logistic map be denoted by $f(x)$.
+Suppose there exists an $h$ such that $h$ is a homeomorphism 
+between $f$ and $g$.  Then $h$ must map every dynamicaly unique 
+orbit of $f$ onto the orbits of $g$.  Observe that the logistic map has a 
+critical point ($f^{\prime} = 0$) at $x=\frac{1}{2}$ for all $\mu$.  This 
+critical point divides the domain of $f$ into two distinct subintervals 
+which map to a common range.  More 
+specifically, $f(\frac{1}{2} + \delta_{1}) = f(\frac{1}{2} - \delta_{2})$ 
+where $\delta_{1} \neq \delta_{2}$ and $\delta_{1} \le \delta_{2}$ without loss of generality for infinitely many (although distinct) 
+pairs of $\delta_{1}$ and $\delta_{2}$.
+
+Now note that $g^{\prime}(x) = (1 - tanh^{2}(wx+b))w \neq 0$ for all $x$ except the trivial case where $w=0$.  
+Consequently, for every $x \neq -\frac{b}{w}$, there can be no $y$ 
+such that $g(x) = g(y)$.
+
+$$f(\frac{1}{2} + \delta_{1}) = f(\frac{1}{2} - \delta_{2})$$
+$$h(f(\frac{1}{2} + \delta_{1})) = h(f(\frac{1}{2} - \delta_{2}))$$
+$$h(f(\frac{1}{2} + \delta_{1})) = g(h^{-1}(\frac{1}{2} + \delta_{1})$$
+$$g(h^{-1}(\frac{1}{2} + \delta_{1})) = g(h^{-1}(\frac{1}{2} + \delta_{2})$$
+$$\delta_{1} = \delta_{2}$$
+Contradiction.  The only assumption was existence of $h$.  There is no such $h$. So, $f$ and $g$ are not homeomorphic and therefore $g$ is not chaotic regardless of parameter choice.
+
+
+\subsection{Multi-neuron networks}
+Multi-neuron networks entail multi-dimensional dynamical systems and showing 
+conjugacy between dynamical systems of differing dimensions is more complicated.
+
+projection
+
+\section{With respect to ESNs}
+baselines and not
+topology vs eigen
+\section{Future Work}
+
+
+
+
+
+
+\end{document}
+
